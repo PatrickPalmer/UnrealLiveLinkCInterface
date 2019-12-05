@@ -29,6 +29,8 @@
 
 #include "UnrealLiveLinkCInterfaceAPI.h"
 
+#include <stddef.h>
+
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
 #include "Windows.h"
@@ -66,12 +68,17 @@ void (*UnrealLiveLink_UpdateCameraFrame)(const char *subjectName, const double w
 	const UnrealLiveLink_PropertyValues *propValues, const UnrealLiveLink_Camera *frame) = NULL;
 
 void (*UnrealLiveLink_SetLightStructure)(
-	const char *subjectName, const UnrealLiveLink_Properties *properties, UnrealLiveLink_LightStatic *structure) = nullptr;
+	const char *subjectName, const UnrealLiveLink_Properties *properties, UnrealLiveLink_LightStatic *structure) = NULL;
 void (*UnrealLiveLink_UpdateLightFrame)(const char *subjectName, const double worldTime, const UnrealLiveLink_Metadata *metadata,
 	const UnrealLiveLink_PropertyValues *propValues, const UnrealLiveLink_Light *frame) = NULL;
 
+#ifdef WIN32
 static HMODULE UnrealLiveLink_SharedObject = NULL;
+#else
+static void * UnrealLiveLink_SharedObject = NULL;
+#endif
 
+#ifdef WIN32
 int UnrealLiveLink_Load(const char *cInterfaceSharedObjectFilename, const char *interfaceName)
 {
 	UnrealLiveLink_SharedObject = NULL;
@@ -152,11 +159,6 @@ int UnrealLiveLink_Load(const char *cInterfaceSharedObjectFilename, const char *
 	return UNREAL_LIVE_LINK_OK;
 }
 
-bool UnrealLiveLink_IsLoaded()
-{
-	return UnrealLiveLink_SharedObject != NULL;
-}
-
 void UnrealLiveLink_Unload()
 {
 	if (UnrealLiveLink_UninitializeMessagingInterface)
@@ -169,6 +171,21 @@ void UnrealLiveLink_Unload()
 		FreeLibrary(UnrealLiveLink_SharedObject);
 		UnrealLiveLink_SharedObject = NULL;
 	}
+}
+#else
+
+int UnrealLiveLink_Load(const char *cInterfaceSharedObjectFilename, const char *interfaceName)
+{
+}
+
+void UnrealLiveLink_Unload()
+{
+}
+#endif
+
+bool UnrealLiveLink_IsLoaded()
+{
+	return UnrealLiveLink_SharedObject != NULL;
 }
 
 void UnrealLiveLink_InitMetadata(UnrealLiveLink_Metadata *metadata)

@@ -34,4 +34,5 @@ The Maya Unreal Live Link DLL provided much inspiration.
 ## Future work
 
  * examples (C++ and Python)
+ * linux support
 

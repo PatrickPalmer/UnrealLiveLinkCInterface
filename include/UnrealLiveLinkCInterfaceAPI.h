@@ -29,9 +29,9 @@
 /**
  * function result values (if return int)
  */
-#define UNREAL_LIVE_LINK_OK				0
-#define UNREAL_LIVE_LINK_WRONG_VERSION	1
-#define UNREAL_LIVE_LINK_MISSING_LIB	2
+#define UNREAL_LIVE_LINK_OK			0
+#define UNREAL_LIVE_LINK_WRONG_VERSION		1
+#define UNREAL_LIVE_LINK_MISSING_LIB		2
 #define UNREAL_LIVE_LINK_INCOMPLETE		3
 
 
