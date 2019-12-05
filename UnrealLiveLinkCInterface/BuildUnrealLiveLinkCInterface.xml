@@ -1,0 +1,21 @@
+<?xml version='1.0' ?>
+<BuildGraph xmlns="http://www.epicgames.com/BuildGraph" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.epicgames.com/BuildGraph ../../../Engine/Build/Graph/Schema.xsd" >
+  <Property Name="LocalSourceDir" Value="$(RootDir)\Engine\Source\Programs\UnrealLiveLinkCInterface"/>
+  <Property Name="LocalStagingDir" Value="$(LocalSourceDir)\Staging"/>
+  <Property Name="LocalBinaryDir" Value="$(RootDir)\Engine\Binaries\Win64"/>
+  
+  <Agent Name="UnrealLiveLinkCInterface" Type="Win64">
+    <Node Name="Compile UnrealHeaderTool Win64">
+      <Compile Target="UnrealHeaderTool" Platform="Win64" Configuration="Development" Arguments="-precompile -nodebuginfo"/>
+    </Node>
+
+    <Node Name="Compile CInterface Live Link Win64" Requires="Compile UnrealHeaderTool Win64">
+      <Compile Target="UnrealLiveLinkCInterface" Platform="Win64" Configuration="Development" />
+    </Node>
+	
+    <Node Name="Live Link CInterface Module" Requires="Compile CInterface Live Link Win64">
+		<Copy From="$(LocalBinaryDir)\CInterfaceProgram.exe" To="$(LocalStagingDir)\UnrealLiveLinkCInterface\UnrealLiveLinkCInterface.exe" />
+		<Zip FromDir="$(LocalStagingDir)" ZipFile="$(LocalStagingDir)\UnrealLiveLinkCInterface.zip"/>
+    </Node>
+  </Agent>
+</BuildGraph>
