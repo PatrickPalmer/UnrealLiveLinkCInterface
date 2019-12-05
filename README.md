@@ -1,19 +1,19 @@
-= Unreal Live Link C interface =
+# Unreal Live Link C interface
 Version 1.2
 
 For Unreal v4.23 or greater.
 
-== Overview ==
+## Overview
 
 This small library provides a C Interface to the Unreal Live Link Message Bus API.   This allows for third party packages to stream to Unreal Live Link without requiring to compile with the Unreal Build Tool (UBT).   This is done by exposing the Live Link API via a C interface in a shared object compiled using UBT.    This shared object is loaded via an API and exposed functions can be called with a light weight interface.
 
 The Unreal Live Link Message Bus API is fully exposed except the per frame metadata scene time is limited to just SMPTE timecode.  
 
-== Building the Unreal DLL ==
+## Building the Unreal DLL
 
 Building the Unreal Live Link C Interface plugin DLL requires the Unreal Engine source code.   Download the source code from [github](https://github.com/EpicGames/UnrealEngine).
 
-=== On Windows ===
+### Windows
 
  * copy the UnrealLiveLinkCInterface directory from this repository to [UNREAL_ENGINE_SRC_LOCATION]\Engine\Source\Programs
  * copy the file include/UnrealLiveLinkCInterfaceTypes.h from this repository to [UNREAL_ENGINE_SRC_LOCATION]\Engine\Source\Programs\UnrealLiveLinkCInterface directory
@@ -23,7 +23,7 @@ Building the Unreal Live Link C Interface plugin DLL requires the Unreal Engine 
  * build
  * the DLL can be found at [UNREAL_ENGINE_SRC_LOCATION]\Engine\Binaries\Win64\UnrealLiveLinkCInterface.dll
 
-== Design considerations ==
+## Design considerations
 
 I wanted to use C language for the API as it has the smallest requirements to interface with any language.   The API should compile with a C99 ANSI standard compiler though could work with C89 with minor changes (changing bool to int). 
 
@@ -31,7 +31,7 @@ This middleware code adds an extra layer between the third party software the Un
 
 The Maya Unreal Live Link DLL provided much inspiration.
 
-== Future work ==
+## Future work
 
  * examples (C++ and Python)
 
