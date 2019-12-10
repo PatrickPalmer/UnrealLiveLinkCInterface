@@ -34,6 +34,8 @@
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
 #include "Windows.h"
+#else
+#include <dlfcn.h>
 #endif
 
 
@@ -74,23 +76,30 @@ void (*UnrealLiveLink_UpdateLightFrame)(const char *subjectName, const double wo
 
 #ifdef WIN32
 static HMODULE UnrealLiveLink_SharedObject = NULL;
+
+#define GET_FUNC_ADDR GetProcAddress
 #else
 static void * UnrealLiveLink_SharedObject = NULL;
+
+#define GET_FUNC_ADDR dlsym
 #endif
 
-#ifdef WIN32
 int UnrealLiveLink_Load(const char *cInterfaceSharedObjectFilename, const char *interfaceName)
 {
 	UnrealLiveLink_SharedObject = NULL;
 
-	auto mod = LoadLibrary(cInterfaceSharedObjectFilename);
+#ifdef WIN32
+	HMODULE mod = LoadLibrary(cInterfaceSharedObjectFilename);
+#else
+	void * mod = dlopen(cInterfaceSharedObjectFilename, RTLD_LAZY);
+#endif
 	if (!mod)
 	{
 		return UNREAL_LIVE_LINK_MISSING_LIB;
 	}
 
 	/* check API version */
-	UnrealLiveLink_GetVersion = (int (*)()) GetProcAddress(mod, "UnrealLiveLink_GetVersion");
+	UnrealLiveLink_GetVersion = (int (*)()) GET_FUNC_ADDR(mod, "UnrealLiveLink_GetVersion");
 	if (UnrealLiveLink_GetVersion)
 	{
 		if ((*UnrealLiveLink_GetVersion)() != UNREAL_LIVE_LINK_API_VERSION)
@@ -104,43 +113,43 @@ int UnrealLiveLink_Load(const char *cInterfaceSharedObjectFilename, const char *
 	}
 
 	UnrealLiveLink_InitializeMessagingInterface =
-		(bool (*)(const char *)) GetProcAddress(mod, "UnrealLiveLink_InitializeMessagingInterface");
+		(bool (*)(const char *)) GET_FUNC_ADDR(mod, "UnrealLiveLink_InitializeMessagingInterface");
 	UnrealLiveLink_UninitializeMessagingInterface =
-		(bool (*)()) GetProcAddress(mod, "UnrealLiveLink_UninitializeMessagingInterface");
+		(bool (*)()) GET_FUNC_ADDR(mod, "UnrealLiveLink_UninitializeMessagingInterface");
 	UnrealLiveLink_RegisterConnectionUpdateCallback =
-		(void (*)(void (*)())) GetProcAddress(mod, "UnrealLiveLink_RegisterConnectionUpdateCallback");
-	UnrealLiveLink_HasConnection = (bool (*)()) GetProcAddress(mod, "UnrealLiveLink_HasConnection");
+		(void (*)(void (*)())) GET_FUNC_ADDR(mod, "UnrealLiveLink_RegisterConnectionUpdateCallback");
+	UnrealLiveLink_HasConnection = (bool (*)()) GET_FUNC_ADDR(mod, "UnrealLiveLink_HasConnection");
 
 	UnrealLiveLink_SetBasicStructure =
-		(void (*)(const char *, const UnrealLiveLink_Properties *)) GetProcAddress(mod, "UnrealLiveLink_SetBasicStructure");
+		(void (*)(const char *, const UnrealLiveLink_Properties *)) GET_FUNC_ADDR(mod, "UnrealLiveLink_SetBasicStructure");
 	UnrealLiveLink_UpdateBasicFrame = (void (*)(const char *, const double, const UnrealLiveLink_Metadata *,
-		const UnrealLiveLink_PropertyValues *)) GetProcAddress(mod, "UnrealLiveLink_UpdateBasicFrame");
+		const UnrealLiveLink_PropertyValues *)) GET_FUNC_ADDR(mod, "UnrealLiveLink_UpdateBasicFrame");
 
 	UnrealLiveLink_DefaultAnimationStructure =
-		(void (*)(const char *, const UnrealLiveLink_Properties *)) GetProcAddress(mod, "UnrealLiveLink_DefaultAnimationStructure");
+		(void (*)(const char *, const UnrealLiveLink_Properties *)) GET_FUNC_ADDR(mod, "UnrealLiveLink_DefaultAnimationStructure");
 	UnrealLiveLink_SetAnimationStructure = (void (*)(const char *, const UnrealLiveLink_Properties *,
-		UnrealLiveLink_AnimationStatic *)) GetProcAddress(mod, "UnrealLiveLink_SetAnimationStructure");
+		UnrealLiveLink_AnimationStatic *)) GET_FUNC_ADDR(mod, "UnrealLiveLink_SetAnimationStructure");
 	UnrealLiveLink_UpdateAnimationFrame =
 		(void (*)(const char *, const double, const UnrealLiveLink_Metadata *, const UnrealLiveLink_PropertyValues *,
-			const UnrealLiveLink_Animation *)) GetProcAddress(mod, "UnrealLiveLink_UpdateAnimationFrame");
+			const UnrealLiveLink_Animation *)) GET_FUNC_ADDR(mod, "UnrealLiveLink_UpdateAnimationFrame");
 
 	UnrealLiveLink_SetTransformStructure =
-		(void (*)(const char *, const UnrealLiveLink_Properties *)) GetProcAddress(mod, "UnrealLiveLink_SetTransformStructure");
+		(void (*)(const char *, const UnrealLiveLink_Properties *)) GET_FUNC_ADDR(mod, "UnrealLiveLink_SetTransformStructure");
 	UnrealLiveLink_UpdateTransformFrame =
 		(void (*)(const char *, const double, const UnrealLiveLink_Metadata *, const UnrealLiveLink_PropertyValues *,
-			const UnrealLiveLink_Transform *)) GetProcAddress(mod, "UnrealLiveLink_UpdateTransformFrame");
+			const UnrealLiveLink_Transform *)) GET_FUNC_ADDR(mod, "UnrealLiveLink_UpdateTransformFrame");
 
 	UnrealLiveLink_SetCameraStructure = (void (*)(const char *, const UnrealLiveLink_Properties *,
-		UnrealLiveLink_CameraStatic *)) GetProcAddress(mod, "UnrealLiveLink_SetCameraStructure");
+		UnrealLiveLink_CameraStatic *)) GET_FUNC_ADDR(mod, "UnrealLiveLink_SetCameraStructure");
 	UnrealLiveLink_UpdateCameraFrame =
 		(void (*)(const char *, const double, const UnrealLiveLink_Metadata *, const UnrealLiveLink_PropertyValues *,
-			const UnrealLiveLink_Camera *)) GetProcAddress(mod, "UnrealLiveLink_UpdateCameraFrame");
+			const UnrealLiveLink_Camera *)) GET_FUNC_ADDR(mod, "UnrealLiveLink_UpdateCameraFrame");
 
 	UnrealLiveLink_SetLightStructure = (void (*)(const char *, const UnrealLiveLink_Properties *,
-		UnrealLiveLink_LightStatic *)) GetProcAddress(mod, "UnrealLiveLink_SetLightStructure");
+		UnrealLiveLink_LightStatic *)) GET_FUNC_ADDR(mod, "UnrealLiveLink_SetLightStructure");
 	UnrealLiveLink_UpdateLightFrame =
 		(void (*)(const char *, const double, const UnrealLiveLink_Metadata *, const UnrealLiveLink_PropertyValues *,
-			const UnrealLiveLink_Light *)) GetProcAddress(mod, "UnrealLiveLink_UpdateLightFrame");
+			const UnrealLiveLink_Light *)) GET_FUNC_ADDR(mod, "UnrealLiveLink_UpdateLightFrame");
 
 	if (!UnrealLiveLink_InitializeMessagingInterface || !UnrealLiveLink_UninitializeMessagingInterface ||
 		!UnrealLiveLink_RegisterConnectionUpdateCallback || !UnrealLiveLink_HasConnection || !UnrealLiveLink_SetBasicStructure ||
@@ -168,20 +177,14 @@ void UnrealLiveLink_Unload()
 
 	if (UnrealLiveLink_SharedObject)
 	{
+#ifdef WIN32
 		FreeLibrary(UnrealLiveLink_SharedObject);
+#else
+		dlclose(UnrealLiveLink_SharedObject);
+#endif
 		UnrealLiveLink_SharedObject = NULL;
 	}
 }
-#else
-
-int UnrealLiveLink_Load(const char *cInterfaceSharedObjectFilename, const char *interfaceName)
-{
-}
-
-void UnrealLiveLink_Unload()
-{
-}
-#endif
 
 bool UnrealLiveLink_IsLoaded()
 {

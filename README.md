@@ -1,5 +1,5 @@
 # Unreal Live Link C interface
-Version 1.2
+Version 1.2.1
 
 For Unreal v4.23 or greater.
 
