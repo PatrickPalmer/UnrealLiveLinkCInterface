@@ -25,39 +25,35 @@
 
 #include "UnrealLiveLinkCInterfaceTypes.h"
 
-
-/**
- * function result values (if return int)
- */
-#define UNREAL_LIVE_LINK_OK			0
-#define UNREAL_LIVE_LINK_WRONG_VERSION		1
-#define UNREAL_LIVE_LINK_MISSING_LIB		2
-#define UNREAL_LIVE_LINK_INCOMPLETE		3
-
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 /**
  * load the Unreal Live Link C Interface shared object
  * for the load to succeed, the Unreal Live Link C Interface version must match
  * @param cInterfaceSharedObjectFilename shared object filename
  * @param interfaceName name of Live Link interface appearing in Unreal
- * @return results
+ * @return results (success returns UNREAL_LIVE_LINK_OK)
  */
-int UnrealLiveLink_Load(const char *cInterfaceSharedObjectFilename, const char *interfaceName);
+extern int UnrealLiveLink_Load(const char *cInterfaceSharedObjectFilename, const char *interfaceName);
 
 /**
  * if Unreal Live Link C Interface shared object is loaded
+ * @returns UNREAL_LIVE_LINK_OK if loaded, UNREADL_LIVE_LINK_NOT_LOADED if not
  */
-bool UnrealLiveLink_IsLoaded();
+extern int UnrealLiveLink_IsLoaded();
 
 /**
  * unload Unreal Live Link C Interface shared object
  */
-void UnrealLiveLink_Unload();
+extern void UnrealLiveLink_Unload();
 
 /**
  * get the current version of the Unreal Live Link C Interface
  * the version integer is specific to this API and not matching against Unreal Versions
- * @return version of the Unreal Live Link C Interface
+ * @return version of the Unreal Live Link C Interface (UNREAL_LIVE_LINK_API_VERSION value at compile time)
  */
 extern int (*UnrealLiveLink_GetVersion)();
 
@@ -65,17 +61,17 @@ extern int (*UnrealLiveLink_GetVersion)();
  * initialize message interface
  * automatically called by UnrealLiveLink_Load() so user does not need to call directly
  * @param interfaceName name of Live Link interface appearing in Unreal
- * @return results
+ * @return results (success returns UNREAL_LIVE_LINK_OK)
  */
-extern bool (*UnrealLiveLink_InitializeMessagingInterface)(const char *interfaceName);
+extern int (*UnrealLiveLink_InitializeMessagingInterface)(const char *interfaceName);
 
 /**
  * uninitialize message interface
  * automatically called by UnrealLiveLink_Unload() so user does not need to call directly
  * @param interfaceName name of Live Link interface appearing in Unreal
- * @return results
+ * @return results (success returns UNREAL_LIVE_LINK_OK)
  */
-extern bool (*UnrealLiveLink_UninitializeMessagingInterface)();
+extern int (*UnrealLiveLink_UninitializeMessagingInterface)();
 
 /**
  * register a function callback if the connection to Unreal changes
@@ -85,15 +81,15 @@ extern void (*UnrealLiveLink_RegisterConnectionUpdateCallback)(void (*callback)(
 
 /**
  * connection with Unreal?
- * @return connection status
+ * @return UNREAL_LIVE_LINK_OK if connected, UNREADL_LIVE_LINK_NOT_CONNECTED if not
  */
-extern bool (*UnrealLiveLink_HasConnection)();
+extern int (*UnrealLiveLink_HasConnection)();
 
 /**
  * initialize the Metadata structure with default values
  * @param metadata Metadata structure
  */
-extern void UnrealLiveLink_InitMetadata(UnrealLiveLink_Metadata *metadata);
+extern void UnrealLiveLink_InitMetadata(struct UnrealLiveLink_Metadata *metadata);
 
 
 
@@ -105,7 +101,7 @@ extern void UnrealLiveLink_InitMetadata(UnrealLiveLink_Metadata *metadata);
  * @param subjectName Unreal subject name
  * @param properties named float properties
  */
-extern void (*UnrealLiveLink_SetBasicStructure)(const char *subjectName, const UnrealLiveLink_Properties *properties);
+extern void (*UnrealLiveLink_SetBasicStructure)(const char *subjectName, const struct UnrealLiveLink_Properties *properties);
 
 /**
  * Basic Generic Roll per frame values
@@ -115,7 +111,7 @@ extern void (*UnrealLiveLink_SetBasicStructure)(const char *subjectName, const U
  * @param propValues named properties float values (may pass in null for none)
  */
 extern void (*UnrealLiveLink_UpdateBasicFrame)(const char *subjectName, const double worldTime,
-	const UnrealLiveLink_Metadata *metadata, const UnrealLiveLink_PropertyValues *propValues);
+	const struct UnrealLiveLink_Metadata *metadata, const struct UnrealLiveLink_PropertyValues *propValues);
 
 
 
@@ -126,7 +122,7 @@ extern void (*UnrealLiveLink_UpdateBasicFrame)(const char *subjectName, const do
  * @param subjectName Unreal subject name
  * @param properties named float properties
  */
-extern void (*UnrealLiveLink_DefaultAnimationStructure)(const char *name, const UnrealLiveLink_Properties *properties);
+extern void (*UnrealLiveLink_DefaultAnimationStructure)(const char *name, const struct UnrealLiveLink_Properties *properties);
 
 /**
  * Animation Roll setup
@@ -134,7 +130,7 @@ extern void (*UnrealLiveLink_DefaultAnimationStructure)(const char *name, const 
  * @param properties named float properties
  */
 extern void (*UnrealLiveLink_SetAnimationStructure)(
-	const char *subjectName, const UnrealLiveLink_Properties *properties, UnrealLiveLink_AnimationStatic *structure);
+	const char *subjectName, const struct UnrealLiveLink_Properties *properties, struct UnrealLiveLink_AnimationStatic *structure);
 
 /**
  * Animation Roll per frame values
@@ -145,8 +141,8 @@ extern void (*UnrealLiveLink_SetAnimationStructure)(
  * @param frame animation frame
  */
 extern void (*UnrealLiveLink_UpdateAnimationFrame)(const char *subjectName, const double worldTime,
-	const UnrealLiveLink_Metadata *metadata, const UnrealLiveLink_PropertyValues *propValues,
-	const UnrealLiveLink_Animation *frame);
+	const struct UnrealLiveLink_Metadata *metadata, const struct UnrealLiveLink_PropertyValues *propValues,
+	const struct UnrealLiveLink_Animation *frame);
 
 
 
@@ -156,14 +152,14 @@ extern void (*UnrealLiveLink_UpdateAnimationFrame)(const char *subjectName, cons
  * initialize transform structure to identity
  * @param transform transform to set
  */
-extern void UnrealLiveLink_InitTransform(UnrealLiveLink_Transform *transform);
+extern void UnrealLiveLink_InitTransform(struct UnrealLiveLink_Transform *transform);
 
 /**
  * Transform Roll setup
  * @param subjectName Unreal subject name
  * @param properties named float properties
  */
-extern void (*UnrealLiveLink_SetTransformStructure)(const char *subjectName, const UnrealLiveLink_Properties *properties);
+extern void (*UnrealLiveLink_SetTransformStructure)(const char *subjectName, const struct UnrealLiveLink_Properties *properties);
 
 /**
  * Transform Roll per frame values
@@ -174,8 +170,8 @@ extern void (*UnrealLiveLink_SetTransformStructure)(const char *subjectName, con
  * @param frame transform
  */
 extern void (*UnrealLiveLink_UpdateTransformFrame)(const char *subjectName, const double worldTime,
-	const UnrealLiveLink_Metadata *metadata, const UnrealLiveLink_PropertyValues *propValues,
-	const UnrealLiveLink_Transform *frame);
+	const struct UnrealLiveLink_Metadata *metadata, const struct UnrealLiveLink_PropertyValues *propValues,
+	const struct UnrealLiveLink_Transform *frame);
 
 
 
@@ -185,13 +181,13 @@ extern void (*UnrealLiveLink_UpdateTransformFrame)(const char *subjectName, cons
  * initialize camera static to default values
  * @param structure structure to set
  */
-extern void UnrealLiveLink_InitCameraStatic(UnrealLiveLink_CameraStatic *structure);
+extern void UnrealLiveLink_InitCameraStatic(struct UnrealLiveLink_CameraStatic *structure);
 
 /**
  * initialize camera per frame to default values
  * @param structure structure to set
  */
-extern void UnrealLiveLink_InitCamera(UnrealLiveLink_Camera *structure);
+extern void UnrealLiveLink_InitCamera(struct UnrealLiveLink_Camera *structure);
 
 /**
  * Camera Roll setup
@@ -199,7 +195,7 @@ extern void UnrealLiveLink_InitCamera(UnrealLiveLink_Camera *structure);
  * @param properties named float properties
  */
 extern void (*UnrealLiveLink_SetCameraStructure)(
-	const char *subjectName, const UnrealLiveLink_Properties *properties, UnrealLiveLink_CameraStatic *structure);
+	const char *subjectName, const struct UnrealLiveLink_Properties *properties, struct UnrealLiveLink_CameraStatic *structure);
 
 /**
  * Camera Roll per frame values
@@ -210,7 +206,7 @@ extern void (*UnrealLiveLink_SetCameraStructure)(
  * @param frame camera values
  */
 extern void (*UnrealLiveLink_UpdateCameraFrame)(const char *subjectName, const double worldTime,
-	const UnrealLiveLink_Metadata *metadata, const UnrealLiveLink_PropertyValues *propValues, const UnrealLiveLink_Camera *frame);
+	const struct UnrealLiveLink_Metadata *metadata, const struct UnrealLiveLink_PropertyValues *propValues, const struct UnrealLiveLink_Camera *frame);
 
 
 
@@ -220,13 +216,13 @@ extern void (*UnrealLiveLink_UpdateCameraFrame)(const char *subjectName, const d
  * initialize light static to default values
  * @param structure structure to set
  */
-extern void UnrealLiveLink_InitLightStatic(UnrealLiveLink_LightStatic *structure);
+extern void UnrealLiveLink_InitLightStatic(struct UnrealLiveLink_LightStatic *structure);
 
 /**
  * initialize light per frame to default values
  * @param structure structure to set
  */
-extern void UnrealLiveLink_InitLight(UnrealLiveLink_Light *structure);
+extern void UnrealLiveLink_InitLight(struct UnrealLiveLink_Light *structure);
 
 /**
  * Light Roll setup
@@ -234,7 +230,7 @@ extern void UnrealLiveLink_InitLight(UnrealLiveLink_Light *structure);
  * @param properties named float properties
  */
 extern void (*UnrealLiveLink_SetLightStructure)(
-	const char *subjectName, const UnrealLiveLink_Properties *properties, UnrealLiveLink_LightStatic *structure);
+	const char *subjectName, const struct UnrealLiveLink_Properties *properties, struct UnrealLiveLink_LightStatic *structure);
 
 /**
  * Light Roll per frame values
@@ -245,7 +241,11 @@ extern void (*UnrealLiveLink_SetLightStructure)(
  * @param frame light values
  */
 extern void (*UnrealLiveLink_UpdateLightFrame)(const char *subjectName, const double worldTime,
-	const UnrealLiveLink_Metadata *metadata, const UnrealLiveLink_PropertyValues *propValues, const UnrealLiveLink_Light *frame);
+	const struct UnrealLiveLink_Metadata *metadata, const struct UnrealLiveLink_PropertyValues *propValues, const struct UnrealLiveLink_Light *frame);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

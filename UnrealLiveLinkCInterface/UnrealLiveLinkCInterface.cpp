@@ -38,23 +38,23 @@ std::vector<void (*)()> ConnectionCallbacks;
 
 std::array<std::pair<int32_t, int32_t>, UNREAL_LIVE_LINK_TIMECODE_120+1> TimecodeRates = {
 	{
-		{ 0, 0 },			// unknown
+		{ 0, 0 },		// unknown
 		{ 24000, 1001 },	// 23.98
-		{ 24, 1 },			// 24
-		{ 25, 1 },			// 25
+		{ 24, 1 },		// 24
+		{ 25, 1 },		// 25
 		{ 30000, 1001 },	// 29.97 NDF
 		{ 30000, 1001 },	// 29.97 DF
-		{ 30, 1 },			// 30
+		{ 30, 1 },		// 30
 		{ 48000, 1001 },	// 47.95
-		{ 48, 1 },			// 48
-		{ 50, 1 },			// 50
+		{ 48, 1 },		// 48
+		{ 50, 1 },		// 50
 		{ 60000, 1001 },	// 59.94 NDF
 		{ 60000, 1001 },	// 59.94 DF
-		{ 60, 1 },			// 60
-		{ 72, 1 },			// 72
-		{ 96, 1 },			// 96
-		{ 100, 1 },			// 100
-		{ 120, 1 }			// 120
+		{ 60, 1 },		// 60
+		{ 72, 1 },		// 72
+		{ 96, 1 },		// 96
+		{ 100, 1 },		// 100
+		{ 120, 1 }		// 120
 	}
 };
 
@@ -80,7 +80,7 @@ int UnrealLiveLink_GetVersion()
 	return UNREAL_LIVE_LINK_API_VERSION;
 }
 
-bool UnrealLiveLink_InitializeMessagingInterface(const char *interfaceName)
+int UnrealLiveLink_InitializeMessagingInterface(const char *interfaceName)
 {
 	// SET UP
 	GEngineLoop.PreInit(TEXT("UnrealLiveLinkCInterface -Messaging"));
@@ -106,10 +106,10 @@ bool UnrealLiveLink_InitializeMessagingInterface(const char *interfaceName)
 
 	UE_LOG(LogUnrealLiveLinkCInterface, Display, TEXT("Live Link C Interface Initialized"));
 
-	return true;
+	return UNREAL_LIVE_LINK_OK;
 }
 
-bool UnrealLiveLink_UninitializeMessagingInterface()
+int UnrealLiveLink_UninitializeMessagingInterface()
 {
 	// TEAR DOWN
 	UE_LOG(LogUnrealLiveLinkCInterface, Display, TEXT("Live Link C Interface Shutting Down"));
@@ -124,7 +124,7 @@ bool UnrealLiveLink_UninitializeMessagingInterface()
 
 	LiveLinkProvider = nullptr;
 
-	return true;
+	return UNREAL_LIVE_LINK_OK;
 }
 
 void UnrealLiveLink_RegisterConnectionUpdateCallback(void (*callback)())
@@ -132,9 +132,9 @@ void UnrealLiveLink_RegisterConnectionUpdateCallback(void (*callback)())
 	ConnectionCallbacks.push_back(callback);
 }
 
-bool UnrealLiveLink_HasConnection()
+int UnrealLiveLink_HasConnection()
 {
-	return LiveLinkProvider->HasConnection();
+	return LiveLinkProvider->HasConnection() ? UNREAL_LIVE_LINK_OK : UNREAL_LIVE_LINK_NOT_CONNECTED;
 }
 
 

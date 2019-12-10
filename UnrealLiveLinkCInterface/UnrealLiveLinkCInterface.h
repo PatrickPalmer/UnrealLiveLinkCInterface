@@ -17,13 +17,13 @@ extern "C"
 
 APICALL int UnrealLiveLink_GetVersion();
 
-APICALL bool UnrealLiveLink_InitializeMessagingInterface(const char *interfaceName);
+APICALL int UnrealLiveLink_InitializeMessagingInterface(const char *interfaceName);
 
-APICALL bool UnrealLiveLink_UninitializeMessagingInterface();
+APICALL int UnrealLiveLink_UninitializeMessagingInterface();
 
 APICALL void UnrealLiveLink_RegisterConnectionUpdateCallback(void (*callback)());
 
-APICALL bool UnrealLiveLink_HasConnection();
+APICALL int UnrealLiveLink_HasConnection();
 
 APICALL void UnrealLiveLink_SetBasicStructure(const char *subjectName, const UnrealLiveLink_Properties *properties);
 APICALL void UnrealLiveLink_UpdateBasicFrame(const char *subjectName, const double worldTime,

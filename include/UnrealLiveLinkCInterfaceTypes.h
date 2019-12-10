@@ -24,13 +24,22 @@
 #ifndef _UNREAL_LIVE_LINK_C_INTERFACE_TYPES_H
 #define _UNREAL_LIVE_LINK_C_INTERFACE_TYPES_H 1
 
-
 #include <stdint.h>
-#include <stdbool.h>
 
-#define UNREAL_LIVE_LINK_API_VERSION 2
+#define UNREAL_LIVE_LINK_API_VERSION 3
 
 #define UNREAL_LIVE_LINK_MAX_NAME_LENGTH 128
+
+/**
+ * function result values (if return success as an int)
+ */
+#define UNREAL_LIVE_LINK_OK			0
+#define UNREAL_LIVE_LINK_WRONG_VERSION		1
+#define UNREAL_LIVE_LINK_MISSING_LIB		2
+#define UNREAL_LIVE_LINK_INCOMPLETE		3
+#define UNREAL_LIVE_LINK_NOT_LOADED		4
+#define UNREAL_LIVE_LINK_NOT_CONNECTED		5
+
 
 typedef char UnrealLiveLink_Name[UNREAL_LIVE_LINK_MAX_NAME_LENGTH];
 
@@ -134,27 +143,27 @@ struct UnrealLiveLink_Animation
 
 struct UnrealLiveLink_CameraStatic
 {
-	/* whether to use field of view per frame */
-	bool isFieldOfViewSupported;
+	/* (bool) whether to use field of view per frame */
+	int isFieldOfViewSupported;
 
-	/* whether to use aspect ratio per frame */
-	bool isAspectRatioSupported;
+	/* (bool) whether to use aspect ratio per frame */
+	int isAspectRatioSupported;
 
-	/* whether to use focal length per frame */
-	bool isFocalLengthSupported;
+	/* (bool) whether to use focal length per frame */
+	int isFocalLengthSupported;
 
-	/* whether to use projection mode per frame */
-	bool isProjectionModeSupported;
+	/* (bool) whether to use projection mode per frame */
+	int isProjectionModeSupported;
 
 	/* film back, only for cinematic camera, values greater than 0 will be applied */
 	float filmBackWidth;
 	float filmBackHeight;
 
-	/* whether to use aperture per frame */
-	bool isApertureSupported;
+	/* (bool) whether to use aperture per frame */
+	int isApertureSupported;
 
-	/* whether to use focus distance per frame */
-	bool isFocusDistanceSupported;
+	/* (bool) whether to use focus distance per frame */
+	int isFocusDistanceSupported;
 };
 
 struct UnrealLiveLink_Camera
@@ -178,38 +187,38 @@ struct UnrealLiveLink_Camera
 	float focusDistance;
 
 	/* projection mode of the camera */
-	/* true is perspective, false is orthographic */
-	bool isPerspective;
+	/* (bool) true is perspective, false is orthographic */
+	int isPerspective;
 };
 
 struct UnrealLiveLink_LightStatic
 {
-	/* whether to use temperature per frame */
-	bool isTemperatureSupported;
+	/* (bool) whether to use temperature per frame */
+	int isTemperatureSupported;
 
-	/* whether to use intensity per frame */
-	bool isIntensitySupported;
+	/* (bool) whether to use intensity per frame */
+	int isIntensitySupported;
 
-	/* whether to use light color per frame */
-	bool isLightColorSupported;
+	/* (bool) whether to use light color per frame */
+	int isLightColorSupported;
 
-	/* whether to use inner cone angle per frame, spotlight only */
-	bool isInnerConeAngleSupported;
+	/* (bool) whether to use inner cone angle per frame, spotlight only */
+	int isInnerConeAngleSupported;
 
-	/* whether to use outer cone angle per frame, spotlight only */
-	bool isOuterConeAngleSupported;
+	/* (bool) whether to use outer cone angle per frame, spotlight only */
+	int isOuterConeAngleSupported;
 
-	/* whether to use attenuation radius per frame */
-	bool isAttenuationRadiusSupported;
+	/* (bool) whether to use attenuation radius per frame */
+	int isAttenuationRadiusSupported;
 
-	/* whether to use source length per frame */
-	bool isSourceLengthSupported;
+	/* (bool) whether to use source length per frame */
+	int isSourceLengthSupported;
 
-	/* whether to use source radius per frame */
-	bool isSourceRadiusSupported;
+	/* (bool) whether to use source radius per frame */
+	int isSourceRadiusSupported;
 
-	/* whether to use soft source radius per frame */
-	bool isSoftSourceRadiusSupported;
+	/* (bool) whether to use soft source radius per frame */
+	int isSoftSourceRadiusSupported;
 };
 
 struct UnrealLiveLink_Light

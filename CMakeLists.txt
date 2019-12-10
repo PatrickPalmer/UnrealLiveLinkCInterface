@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.13)
 
-project(UnrealLiveLinkCInterfaceAPI VERSION 1.2.0 DESCRIPTION "Unreal Live Link C Interface")
+project(UnrealLiveLinkCInterfaceAPI VERSION 1.3.0 DESCRIPTION "Unreal Live Link C Interface")
 
-add_library(${PROJECT_NAME} STATIC src/UnrealLiveLinkCInterfaceAPI.cpp)
+add_library(${PROJECT_NAME} STATIC src/UnrealLiveLinkCInterfaceAPI.c)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     VERSION ${PROJECT_VERSION}
