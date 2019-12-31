@@ -52,7 +52,6 @@ void (*UnrealLiveLink_SetBasicStructure)(const char *subjectName, const struct U
 void (*UnrealLiveLink_UpdateBasicFrame)(const char *subjectName, const double worldTime, const struct UnrealLiveLink_Metadata *metadata,
 	const struct UnrealLiveLink_PropertyValues *propValues) = NULL;
 
-void (*UnrealLiveLink_DefaultAnimationStructure)(const char *name, const struct UnrealLiveLink_Properties *properties) = NULL;
 void (*UnrealLiveLink_SetAnimationStructure)(
 	const char *subjectName, const struct UnrealLiveLink_Properties *properties, struct UnrealLiveLink_AnimationStatic *structure) = NULL;
 void (*UnrealLiveLink_UpdateAnimationFrame)(const char *subjectName, const double worldTime,
@@ -125,8 +124,6 @@ int UnrealLiveLink_Load(const char *cInterfaceSharedObjectFilename, const char *
 	UnrealLiveLink_UpdateBasicFrame = (void (*)(const char *, const double, const struct UnrealLiveLink_Metadata *,
 		const struct UnrealLiveLink_PropertyValues *)) GET_FUNC_ADDR(mod, "UnrealLiveLink_UpdateBasicFrame");
 
-	UnrealLiveLink_DefaultAnimationStructure =
-		(void (*)(const char *, const struct UnrealLiveLink_Properties *)) GET_FUNC_ADDR(mod, "UnrealLiveLink_DefaultAnimationStructure");
 	UnrealLiveLink_SetAnimationStructure = (void (*)(const char *, const struct UnrealLiveLink_Properties *,
 		struct UnrealLiveLink_AnimationStatic *)) GET_FUNC_ADDR(mod, "UnrealLiveLink_SetAnimationStructure");
 	UnrealLiveLink_UpdateAnimationFrame =
@@ -153,7 +150,7 @@ int UnrealLiveLink_Load(const char *cInterfaceSharedObjectFilename, const char *
 
 	if (!UnrealLiveLink_InitializeMessagingInterface || !UnrealLiveLink_UninitializeMessagingInterface ||
 		!UnrealLiveLink_RegisterConnectionUpdateCallback || !UnrealLiveLink_HasConnection || !UnrealLiveLink_SetBasicStructure ||
-		!UnrealLiveLink_UpdateBasicFrame || !UnrealLiveLink_DefaultAnimationStructure || !UnrealLiveLink_SetAnimationStructure ||
+		!UnrealLiveLink_UpdateBasicFrame || !UnrealLiveLink_SetAnimationStructure ||
 		!UnrealLiveLink_UpdateAnimationFrame || !UnrealLiveLink_SetTransformStructure || !UnrealLiveLink_UpdateTransformFrame ||
 		!UnrealLiveLink_SetCameraStructure || !UnrealLiveLink_UpdateCameraFrame || !UnrealLiveLink_SetLightStructure ||
 		!UnrealLiveLink_UpdateLightFrame)

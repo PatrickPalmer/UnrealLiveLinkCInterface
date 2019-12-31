@@ -1,5 +1,5 @@
 # Unreal Live Link C interface
-Version 1.3.0
+Version 1.4.0
 
 For Unreal v4.23 or greater.
 
@@ -25,7 +25,7 @@ Building the Unreal Live Link C Interface plugin DLL requires the Unreal Engine 
 
 ## Design considerations
 
-I wanted to use C language (C89) for the API as it has the smallest requirements to interface with any language.   ANSI standard C89 was choosen because it is compatible with Microsoft Visual Studio.
+I wanted to use C language (C89) for the API as it has the smallest requirements to interface with any language.   ANSI standard C89 was choosen because it is compatible with Microsoft Visual Studio.   Boolean types between C and C++ standards are not 100% compatible so I chose to avoid using bool type.   I'm on the fence about creating a custom bool type so the function signatures and structures provide explicit declarations but for now, booleans are passed as ints and contain values 0 and 1.   The code treats boolean types as 0 and not 0 for all tests.
 
 This middleware code adds an extra layer between the third party software the Unreal Live Link.   In doing so, it adds at least 1 additional memory copy for all data (both the initialization and the per frame data).   In my case of a few thousand float values updating at 60Hz wasn't a concern.
 
@@ -33,6 +33,5 @@ The Maya Unreal Live Link DLL provided much inspiration.
 
 ## Future work
 
- * examples
  * linux support
 

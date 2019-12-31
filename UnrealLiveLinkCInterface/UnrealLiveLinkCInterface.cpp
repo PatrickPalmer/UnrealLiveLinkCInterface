@@ -200,19 +200,6 @@ void UnrealLiveLink_UpdateBasicFrame(const char *subjectName, const double world
 }
 
 
-void UnrealLiveLink_DefaultAnimationStructure(const char *name, const UnrealLiveLink_Properties *properties)
-{
-	UnrealLiveLink_Bone bone;
-	::strncpy(bone.name, "root", UNREAL_LIVE_LINK_MAX_NAME_LENGTH);
-	bone.parentIndex = -1;
-
-	UnrealLiveLink_AnimationStatic structure;
-	structure.boneCount = 1;
-	structure.bones = &bone;
-
-	UnrealLiveLink_SetAnimationStructure(name, properties, &structure);
-}
-
 void UnrealLiveLink_SetAnimationStructure(
 	const char *subjectName, const UnrealLiveLink_Properties *properties, UnrealLiveLink_AnimationStatic *structure)
 {

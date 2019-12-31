@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.13)
 
-project(UnrealLiveLinkCInterfaceAPI VERSION 1.3.0 DESCRIPTION "Unreal Live Link C Interface")
+project(UnrealLiveLinkCInterfaceAPI VERSION 1.4.0 DESCRIPTION "Unreal Live Link C Interface")
+
+OPTION(BUILD_EXAMPLES "Build examples" OFF)
 
 add_library(${PROJECT_NAME} STATIC src/UnrealLiveLinkCInterfaceAPI.c)
 
@@ -12,6 +14,10 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC
         ${PROJECT_SOURCE_DIR}/include
 )
+
+if (BUILD_EXAMPLES)
+    ADD_SUBDIRECTORY(examples)
+endif(BUILD_EXAMPLES)
 
 install(TARGETS ${PROJECT_NAME}
     LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib

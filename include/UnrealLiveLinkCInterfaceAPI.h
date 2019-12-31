@@ -118,13 +118,6 @@ extern void (*UnrealLiveLink_UpdateBasicFrame)(const char *subjectName, const do
 /** Animation Roll **/
 
 /**
- * Default Animation Roll setup -- single root skeleton node
- * @param subjectName Unreal subject name
- * @param properties named float properties
- */
-extern void (*UnrealLiveLink_DefaultAnimationStructure)(const char *name, const struct UnrealLiveLink_Properties *properties);
-
-/**
  * Animation Roll setup
  * @param subjectName Unreal subject name
  * @param properties named float properties
