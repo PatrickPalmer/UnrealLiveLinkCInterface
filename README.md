@@ -1,5 +1,5 @@
 # Unreal Live Link C interface
-Version 1.4.0
+Version 1.5.0
 
 For Unreal v4.23 or greater.
 
@@ -31,7 +31,11 @@ This middleware code adds an extra layer between the third party software the Un
 
 The Maya Unreal Live Link DLL provided much inspiration.
 
+## Examples
+
+To try the Circling Transform example, build with the example cmake option turned on (BUILD_EXAMPLES=ON).  Within Unreal, add the Live Link plugin to the current project and restart.   Run the Circling Tranform example program and while it is running, add the CirclingTransform Provider in the Unreal Live Link Manager Window.  Create a cube and add a Live Link component with the subject set to "CirclingTransform".   The cube should be circling in the viewport.
+
 ## Future work
 
- * linux support
-
+ * linux testing
+ * OSX support

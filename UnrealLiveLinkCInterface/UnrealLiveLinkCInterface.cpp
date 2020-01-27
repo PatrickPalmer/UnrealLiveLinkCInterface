@@ -375,7 +375,7 @@ void UnrealLiveLink_UpdateLightFrame(const char *subjectName, const double world
 	lightData.LightColor.R = frame->lightColor[0];
 	lightData.LightColor.G = frame->lightColor[1];
 	lightData.LightColor.B = frame->lightColor[2];
-	lightData.LightColor.A = frame->lightColor[3];
+	lightData.LightColor.A = 255;
 	lightData.InnerConeAngle = frame->innerConeAngle;
 	lightData.OuterConeAngle = frame->outerConeAngle;
 	lightData.AttenuationRadius = frame->attenuationRadius;

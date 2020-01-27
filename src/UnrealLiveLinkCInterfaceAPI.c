@@ -266,7 +266,7 @@ void UnrealLiveLink_InitLight(struct UnrealLiveLink_Light *structure)
 	structure->sourceLength = 0.0f;
 
 	/* default white */
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < 3; i++)
 	{
 		structure->lightColor[i] = 255;
 	}

@@ -26,7 +26,7 @@
 
 #include <stdint.h>
 
-#define UNREAL_LIVE_LINK_API_VERSION 4
+#define UNREAL_LIVE_LINK_API_VERSION 5
 
 #define UNREAL_LIVE_LINK_MAX_NAME_LENGTH 128
 
@@ -231,8 +231,8 @@ struct UnrealLiveLink_Light
 	/* total energy that the light emits in lux. */
 	float intensity;
 
-	/* filter color of the light. */
-	uint8_t lightColor[4];
+	/* filter color of the light (rgb). */
+	uint8_t lightColor[3];
 
 	/* inner cone angle in degrees for a Spotlight. */
 	float innerConeAngle;
