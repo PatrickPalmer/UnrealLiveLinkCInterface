@@ -17,39 +17,39 @@ extern "C"
 
 APICALL int UnrealLiveLink_GetVersion();
 
-APICALL int UnrealLiveLink_InitializeMessagingInterface(const char *interfaceName);
+APICALL int UnrealLiveLink_InitializeMessagingInterface(const char *InterfaceName);
 
 APICALL int UnrealLiveLink_UninitializeMessagingInterface();
 
-APICALL void UnrealLiveLink_RegisterConnectionUpdateCallback(void (*callback)());
+APICALL void UnrealLiveLink_RegisterConnectionUpdateCallback(void (*Callback)());
 
 APICALL int UnrealLiveLink_HasConnection();
 
-APICALL void UnrealLiveLink_SetBasicStructure(const char *subjectName, const UnrealLiveLink_Properties *properties);
-APICALL void UnrealLiveLink_UpdateBasicFrame(const char *subjectName, const double worldTime,
-	const UnrealLiveLink_Metadata *metadata, const UnrealLiveLink_PropertyValues *propValues);
+APICALL void UnrealLiveLink_SetBasicStructure(const char *SubjectName, const UnrealLiveLink_Properties *Properties);
+APICALL void UnrealLiveLink_UpdateBasicFrame(const char *SubjectName, const double WorldTime,
+	const UnrealLiveLink_Metadata *Metadata, const UnrealLiveLink_PropertyValues *PropValues);
 
-APICALL void UnrealLiveLink_DefaultAnimationStructure(const char *name, const UnrealLiveLink_Properties *properties);
+APICALL void UnrealLiveLink_DefaultAnimationStructure(const char *Name, const UnrealLiveLink_Properties *Properties);
 APICALL void UnrealLiveLink_SetAnimationStructure(
-	const char *subjectName, const UnrealLiveLink_Properties *properties, UnrealLiveLink_AnimationStatic *structure);
-APICALL void UnrealLiveLink_UpdateAnimationFrame(const char *subjectName, const double worldTime,
-	const UnrealLiveLink_Metadata *metadata, const UnrealLiveLink_PropertyValues *propValues,
-	const UnrealLiveLink_Animation *frame);
+	const char *SubjectName, const UnrealLiveLink_Properties *Properties, UnrealLiveLink_AnimationStatic *AnimStructure);
+APICALL void UnrealLiveLink_UpdateAnimationFrame(const char *SubjectName, const double WorldTime,
+	const UnrealLiveLink_Metadata *Metadata, const UnrealLiveLink_PropertyValues *PropValues,
+	const UnrealLiveLink_Animation *Frame);
 
-APICALL void UnrealLiveLink_SetTransformStructure(const char *subjectName, const UnrealLiveLink_Properties *properties);
-APICALL void UnrealLiveLink_UpdateTransformFrame(const char *subjectName, const double worldTime,
-	const UnrealLiveLink_Metadata *metadata, const UnrealLiveLink_PropertyValues *propValues,
-	const UnrealLiveLink_Transform *frame);
+APICALL void UnrealLiveLink_SetTransformStructure(const char *SubjectName, const UnrealLiveLink_Properties *Properties);
+APICALL void UnrealLiveLink_UpdateTransformFrame(const char *SubjectName, const double WorldTime,
+	const UnrealLiveLink_Metadata *Metadata, const UnrealLiveLink_PropertyValues *PropValues,
+	const UnrealLiveLink_Transform *Frame);
 
 APICALL void UnrealLiveLink_SetCameraStructure(
-	const char *subjectName, const UnrealLiveLink_Properties *properties, UnrealLiveLink_CameraStatic *structure);
-APICALL void UnrealLiveLink_UpdateCameraFrame(const char *subjectName, const double worldTime,
-	const UnrealLiveLink_Metadata *metadata, const UnrealLiveLink_PropertyValues *propValues, const UnrealLiveLink_Camera *frame);
+	const char *SubjectName, const UnrealLiveLink_Properties *Properties, UnrealLiveLink_CameraStatic *CameraStructure);
+APICALL void UnrealLiveLink_UpdateCameraFrame(const char *SubjectName, const double WorldTime,
+	const UnrealLiveLink_Metadata *Metadata, const UnrealLiveLink_PropertyValues *PropValues, const UnrealLiveLink_Camera *Frame);
 
 APICALL void UnrealLiveLink_SetLightStructure(
-	const char *subjectName, const UnrealLiveLink_Properties *properties, UnrealLiveLink_LightStatic *structure);
-APICALL void UnrealLiveLink_UpdateLightFrame(const char *subjectName, const double worldTime,
-	const UnrealLiveLink_Metadata *metadata, const UnrealLiveLink_PropertyValues *propValues, const UnrealLiveLink_Light *frame);
+	const char *SubjectName, const UnrealLiveLink_Properties *Properties, UnrealLiveLink_LightStatic *LightStructure);
+APICALL void UnrealLiveLink_UpdateLightFrame(const char *SubjectName, const double WorldTime,
+	const UnrealLiveLink_Metadata *Metadata, const UnrealLiveLink_PropertyValues *PropValues, const UnrealLiveLink_Light *Frame);
 
 #ifdef __cplusplus
 }

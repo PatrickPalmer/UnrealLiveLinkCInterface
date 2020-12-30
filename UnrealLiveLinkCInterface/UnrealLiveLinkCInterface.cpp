@@ -20,9 +20,7 @@
 #include "Roles/LiveLinkTransformTypes.h"
 #include "UObject/Object.h"
 
-#include <cstdio>
-#include <vector>
-#include <array>
+//#include <cstdio>
 
 DEFINE_LOG_CATEGORY_STATIC(LogUnrealLiveLinkCInterface, Log, All);
 
@@ -34,10 +32,9 @@ TSharedPtr<ILiveLinkProvider> LiveLinkProvider;
 TSharedPtr<FLiveLinkStreamedSubjectManager> LiveLinkStreamManager;
 FDelegateHandle ConnectionStatusChangedHandle;
 
-std::vector<void (*)()> ConnectionCallbacks;
+TArray<void(*)()> ConnectionCallbacks;
 
-std::array<std::pair<int32_t, int32_t>, UNREAL_LIVE_LINK_TIMECODE_120+1> TimecodeRates = {
-	{
+int32_t TimecodeRates[UNREAL_LIVE_LINK_TIMECODE_120 + 1][2] = {
 		{ 0, 0 },		// unknown
 		{ 24000, 1001 },	// 23.98
 		{ 24, 1 },		// 24
@@ -55,23 +52,23 @@ std::array<std::pair<int32_t, int32_t>, UNREAL_LIVE_LINK_TIMECODE_120+1> Timecod
 		{ 96, 1 },		// 96
 		{ 100, 1 },		// 100
 		{ 120, 1 }		// 120
-	}
 };
 
+
 // set FTransform from Unreal Live Link C Interface Transform
-static void SetFTransform(FTransform &transform, const UnrealLiveLink_Transform &t)
+static void SetFTransform(FTransform &Transform, const UnrealLiveLink_Transform &InTransform)
 {
-	transform.SetRotation(FQuat(t.rotation[0], t.rotation[1], t.rotation[2], t.rotation[3]));
-	transform.SetTranslation(FVector(t.translation[0], t.translation[1], t.translation[2]));
-	transform.SetScale3D(FVector(t.scale[0], t.scale[1], t.scale[2]));
+	Transform.SetRotation(FQuat(InTransform.rotation[0], InTransform.rotation[1], InTransform.rotation[2], InTransform.rotation[3]));
+	Transform.SetTranslation(FVector(InTransform.translation[0], InTransform.translation[1], InTransform.translation[2]));
+	Transform.SetScale3D(FVector(InTransform.scale[0], InTransform.scale[1], InTransform.scale[2]));
 }
 
 
 static void OnConnectionStatusChanged()
 {
-	for (const auto &cb : ConnectionCallbacks)
+	for (const TArray<void (*)()>::ElementType &Callback : ConnectionCallbacks)
 	{
-		cb();
+		Callback();
 	}
 }
 
@@ -80,7 +77,7 @@ int UnrealLiveLink_GetVersion()
 	return UNREAL_LIVE_LINK_API_VERSION;
 }
 
-int UnrealLiveLink_InitializeMessagingInterface(const char *interfaceName)
+int UnrealLiveLink_InitializeMessagingInterface(const char *InterfaceName)
 {
 	// SET UP
 	GEngineLoop.PreInit(TEXT("UnrealLiveLinkCInterface -Messaging"));
@@ -93,7 +90,7 @@ int UnrealLiveLink_InitializeMessagingInterface(const char *interfaceName)
 
 	GLog->TearDown();
 
-	LiveLinkProvider = ILiveLinkProvider::CreateLiveLinkProvider(ANSI_TO_TCHAR(interfaceName));
+	LiveLinkProvider = ILiveLinkProvider::CreateLiveLinkProvider(ANSI_TO_TCHAR(InterfaceName));
 	ConnectionStatusChangedHandle = LiveLinkProvider->RegisterConnStatusChangedHandle(FLiveLinkProviderConnectionStatusChanged::FDelegate::CreateStatic(&OnConnectionStatusChanged));
 
 	// We do not tick the core engine but we need to tick the ticker to make sure the message bus endpoint in LiveLinkProvider is
@@ -127,9 +124,9 @@ int UnrealLiveLink_UninitializeMessagingInterface()
 	return UNREAL_LIVE_LINK_OK;
 }
 
-void UnrealLiveLink_RegisterConnectionUpdateCallback(void (*callback)())
+void UnrealLiveLink_RegisterConnectionUpdateCallback(void (*Callback)())
 {
-	ConnectionCallbacks.push_back(callback);
+	ConnectionCallbacks.Push(Callback);
 }
 
 int UnrealLiveLink_HasConnection()
@@ -138,255 +135,255 @@ int UnrealLiveLink_HasConnection()
 }
 
 
-static void SetBasicFrameParameters(const char *subjectName, const double worldTime,
-	const UnrealLiveLink_Metadata *metadata, const UnrealLiveLink_PropertyValues *propValues, FLiveLinkFrameDataStruct &frameData)
+static void SetBasicFrameParameters(const char *SubjectName, const double WorldTime,
+	const UnrealLiveLink_Metadata *Metadata, const UnrealLiveLink_PropertyValues *PropValues, FLiveLinkFrameDataStruct &FrameData)
 {
-	FLiveLinkBaseFrameData& baseData = *frameData.Cast<FLiveLinkBaseFrameData>();
+	FLiveLinkBaseFrameData& BaseData = *FrameData.Cast<FLiveLinkBaseFrameData>();
 
-	baseData.WorldTime = worldTime;
+	BaseData.WorldTime = WorldTime;
 	
-	if (propValues)
+	if (PropValues)
 	{
-		for (int i = 0; i < propValues->valueCount; i++)
+		for (int Idx = 0; Idx < PropValues->valueCount; Idx++)
 		{
-			baseData.PropertyValues.Add(propValues->values[i]);
+			BaseData.PropertyValues.Add(PropValues->values[Idx]);
 		}
 	}
 
-	if (metadata)
+	if (Metadata)
 	{
-		for (int i = 0; i < metadata->keyValueCount; i++)
+		for (int Idx = 0; Idx < Metadata->keyValueCount; Idx++)
 		{
-			baseData.MetaData.StringMetaData[metadata->keyValues[i].name] = metadata->keyValues[i].value;
+			BaseData.MetaData.StringMetaData[Metadata->keyValues[Idx].name] = Metadata->keyValues[Idx].value;
 		}
 
 		// set sceneTime
-		bool dropFrame = metadata->timecode.format == UNREAL_LIVE_LINK_TIMECODE_29_97_DF || metadata->timecode.format == UNREAL_LIVE_LINK_TIMECODE_59_94_DF;
-		FTimecode tc(metadata->timecode.hours, metadata->timecode.minutes, metadata->timecode.seconds, metadata->timecode.frames, dropFrame);
+		bool DropFrame = Metadata->timecode.format == UNREAL_LIVE_LINK_TIMECODE_29_97_DF || Metadata->timecode.format == UNREAL_LIVE_LINK_TIMECODE_59_94_DF;
+		FTimecode Timecode(Metadata->timecode.hours, Metadata->timecode.minutes, Metadata->timecode.seconds, Metadata->timecode.frames, DropFrame);
 
-		int32_t nom = TimecodeRates[metadata->timecode.format].first;
-		int32_t denom = TimecodeRates[metadata->timecode.format].second;
+		int32_t Nom = TimecodeRates[Metadata->timecode.format][0];
+		int32_t Denom = TimecodeRates[Metadata->timecode.format][1];
 
-		FQualifiedFrameTime ft(tc, FFrameRate(nom, denom));
-		baseData.MetaData.SceneTime = ft;
+		FQualifiedFrameTime FrameTime(Timecode, FFrameRate(Nom, Denom));
+		BaseData.MetaData.SceneTime = FrameTime;
 	}
 }
 
 
-void UnrealLiveLink_SetBasicStructure(const char *subjectName, const UnrealLiveLink_Properties *properties)
+void UnrealLiveLink_SetBasicStructure(const char *SubjectName, const UnrealLiveLink_Properties *Properties)
 {
-	FLiveLinkStaticDataStruct staticData(FLiveLinkBaseStaticData::StaticStruct());
-	FLiveLinkBaseStaticData& baseData = *staticData.Cast<FLiveLinkBaseStaticData>();
+	FLiveLinkStaticDataStruct StaticData(FLiveLinkBaseStaticData::StaticStruct());
+	FLiveLinkBaseStaticData& BaseData = *StaticData.Cast<FLiveLinkBaseStaticData>();
 
-	if (properties)
+	if (Properties)
 	{
-		for (int i = 0; i < properties->nameCount; i++)
+		for (int Idx = 0; Idx < Properties->nameCount; Idx++)
 		{
-			baseData.PropertyNames.Add(properties->names[i]);
+			BaseData.PropertyNames.Add(Properties->names[Idx]);
 		}
 	}
 
-	LiveLinkProvider->UpdateSubjectStaticData(subjectName, ULiveLinkBasicRole::StaticClass(), MoveTemp(staticData));
+	LiveLinkProvider->UpdateSubjectStaticData(SubjectName, ULiveLinkBasicRole::StaticClass(), MoveTemp(StaticData));
 }
 
-void UnrealLiveLink_UpdateBasicFrame(const char *subjectName, const double worldTime,
-	const UnrealLiveLink_Metadata *metadata, const UnrealLiveLink_PropertyValues *propValues)
+void UnrealLiveLink_UpdateBasicFrame(const char *SubjectName, const double WorldTime,
+	const UnrealLiveLink_Metadata *Metadata, const UnrealLiveLink_PropertyValues *PropValues)
 {
-	FLiveLinkFrameDataStruct frameData(FLiveLinkBaseFrameData::StaticStruct());
+	FLiveLinkFrameDataStruct FrameData(FLiveLinkBaseFrameData::StaticStruct());
 
-	SetBasicFrameParameters(subjectName, worldTime, metadata, propValues, frameData);
+	SetBasicFrameParameters(SubjectName, WorldTime, Metadata, PropValues, FrameData);
 
-	LiveLinkProvider->UpdateSubjectFrameData(subjectName, MoveTemp(frameData));
+	LiveLinkProvider->UpdateSubjectFrameData(SubjectName, MoveTemp(FrameData));
 }
 
 
 void UnrealLiveLink_SetAnimationStructure(
-	const char *subjectName, const UnrealLiveLink_Properties *properties, UnrealLiveLink_AnimationStatic *structure)
+	const char *SubjectName, const UnrealLiveLink_Properties *Properties, UnrealLiveLink_AnimationStatic *AnimStructure)
 {
-	FLiveLinkStaticDataStruct staticData(FLiveLinkSkeletonStaticData::StaticStruct());
-	FLiveLinkSkeletonStaticData& animData = *staticData.Cast<FLiveLinkSkeletonStaticData>();
+	FLiveLinkStaticDataStruct StaticData(FLiveLinkSkeletonStaticData::StaticStruct());
+	FLiveLinkSkeletonStaticData& AnimData = *StaticData.Cast<FLiveLinkSkeletonStaticData>();
 
-	if (properties)
+	if (Properties)
 	{
-		for (int i = 0; i < properties->nameCount; i++)
+		for (int Idx = 0; Idx < Properties->nameCount; Idx++)
 		{
-			animData.PropertyNames.Add(properties->names[i]);
+			AnimData.PropertyNames.Add(Properties->names[Idx]);
 		}
 	}
 
-	TArray<FName> names;
-	TArray<int32> indices;
-	for (int i = 0; i < structure->boneCount; i++)
+	TArray<FName> Names;
+	TArray<int32> Indices;
+	for (int Idx = 0; Idx < AnimStructure->boneCount; Idx++)
 	{
-		names.Add(structure->bones[i].name);
-		indices.Add(structure->bones[i].parentIndex);
+		Names.Add(AnimStructure->bones[Idx].name);
+		Indices.Add(AnimStructure->bones[Idx].parentIndex);
 	}
 
-	animData.SetBoneNames(names);
-	animData.SetBoneParents(indices);
+	AnimData.SetBoneNames(Names);
+	AnimData.SetBoneParents(Indices);
 
-	LiveLinkProvider->UpdateSubjectStaticData(subjectName, ULiveLinkAnimationRole::StaticClass(), MoveTemp(staticData));
+	LiveLinkProvider->UpdateSubjectStaticData(SubjectName, ULiveLinkAnimationRole::StaticClass(), MoveTemp(StaticData));
 }
 
-void UnrealLiveLink_UpdateAnimationFrame(const char *subjectName, const double worldTime,
-	const UnrealLiveLink_Metadata *metadata, const UnrealLiveLink_PropertyValues *propValues,
-	const UnrealLiveLink_Animation *frame)
+void UnrealLiveLink_UpdateAnimationFrame(const char *SubjectName, const double WorldTime,
+	const UnrealLiveLink_Metadata *Metadata, const UnrealLiveLink_PropertyValues *PropValues,
+	const UnrealLiveLink_Animation *Frame)
 {
-	FLiveLinkFrameDataStruct frameData(FLiveLinkAnimationFrameData::StaticStruct());
-	FLiveLinkAnimationFrameData& animData = *frameData.Cast<FLiveLinkAnimationFrameData>();
+	FLiveLinkFrameDataStruct FrameData(FLiveLinkAnimationFrameData::StaticStruct());
+	FLiveLinkAnimationFrameData& AnimData = *FrameData.Cast<FLiveLinkAnimationFrameData>();
 
-	for (int i = 0; i < frame->transformCount; i++)
+	for (int Idx = 0; Idx < Frame->transformCount; Idx++)
 	{
-		auto &t = frame->transforms[i];
+		UnrealLiveLink_Transform &Transform = Frame->transforms[Idx];
 
 		FTransform UETrans;
 
-		UETrans.SetRotation(FQuat(t.rotation[0], t.rotation[1], t.rotation[2], t.rotation[3]));
+		UETrans.SetRotation(FQuat(Transform.rotation[0], Transform.rotation[1], Transform.rotation[2], Transform.rotation[3]));
 
-		UETrans.SetTranslation(FVector(t.translation[0], t.translation[1], t.translation[2]));
+		UETrans.SetTranslation(FVector(Transform.translation[0], Transform.translation[1], Transform.translation[2]));
 
-		UETrans.SetScale3D(FVector(t.scale[0], t.scale[1], t.scale[2]));
+		UETrans.SetScale3D(FVector(Transform.scale[0], Transform.scale[1], Transform.scale[2]));
 
-		animData.Transforms.Add(UETrans);
+		AnimData.Transforms.Add(UETrans);
 	}
 
-	SetBasicFrameParameters(subjectName, worldTime, metadata, propValues, frameData);
+	SetBasicFrameParameters(SubjectName, WorldTime, Metadata, PropValues, FrameData);
 	
-	LiveLinkProvider->UpdateSubjectFrameData(subjectName, MoveTemp(frameData));
+	LiveLinkProvider->UpdateSubjectFrameData(SubjectName, MoveTemp(FrameData));
 }
 
 
-void UnrealLiveLink_SetTransformStructure(const char *subjectName, const UnrealLiveLink_Properties *properties)
+void UnrealLiveLink_SetTransformStructure(const char *SubjectName, const UnrealLiveLink_Properties *Properties)
 {
-	FLiveLinkStaticDataStruct staticData(FLiveLinkTransformStaticData::StaticStruct());
-	FLiveLinkTransformStaticData& xformData = *staticData.Cast<FLiveLinkTransformStaticData>();
+	FLiveLinkStaticDataStruct StaticData(FLiveLinkTransformStaticData::StaticStruct());
+	FLiveLinkTransformStaticData& XformData = *StaticData.Cast<FLiveLinkTransformStaticData>();
 
-	if (properties)
+	if (Properties)
 	{
-		for (int i = 0; i < properties->nameCount; i++)
+		for (int Idx = 0; Idx < Properties->nameCount; Idx++)
 		{
-			xformData.PropertyNames.Add(properties->names[i]);
+			XformData.PropertyNames.Add(Properties->names[Idx]);
 		}
 	}
 
-	LiveLinkProvider->UpdateSubjectStaticData(subjectName, ULiveLinkTransformRole::StaticClass(), MoveTemp(staticData));
+	LiveLinkProvider->UpdateSubjectStaticData(SubjectName, ULiveLinkTransformRole::StaticClass(), MoveTemp(StaticData));
 }
 
-void UnrealLiveLink_UpdateTransformFrame(const char *subjectName, const double worldTime,
-	const UnrealLiveLink_Metadata *metadata, const UnrealLiveLink_PropertyValues *propValues,
-	const UnrealLiveLink_Transform *frame)
+void UnrealLiveLink_UpdateTransformFrame(const char *SubjectName, const double WorldTime,
+	const UnrealLiveLink_Metadata *Metadata, const UnrealLiveLink_PropertyValues *PropValues,
+	const UnrealLiveLink_Transform *Frame)
 {
-	FLiveLinkFrameDataStruct frameData(FLiveLinkTransformFrameData::StaticStruct());
-	FLiveLinkTransformFrameData& xformData = *frameData.Cast<FLiveLinkTransformFrameData>();
+	FLiveLinkFrameDataStruct FrameData(FLiveLinkTransformFrameData::StaticStruct());
+	FLiveLinkTransformFrameData& XformData = *FrameData.Cast<FLiveLinkTransformFrameData>();
 
-	SetFTransform(xformData.Transform, *frame);
+	SetFTransform(XformData.Transform, *Frame);
 
-	SetBasicFrameParameters(subjectName, worldTime, metadata, propValues, frameData);
+	SetBasicFrameParameters(SubjectName, WorldTime, Metadata, PropValues, FrameData);
 	
-	LiveLinkProvider->UpdateSubjectFrameData(subjectName, MoveTemp(frameData));
+	LiveLinkProvider->UpdateSubjectFrameData(SubjectName, MoveTemp(FrameData));
 }
 
 
 void UnrealLiveLink_SetCameraStructure(
-	const char *subjectName, const UnrealLiveLink_Properties *properties, UnrealLiveLink_CameraStatic *structure)
+	const char *SubjectName, const UnrealLiveLink_Properties *Properties, UnrealLiveLink_CameraStatic *CameraStructure)
 {
-	FLiveLinkStaticDataStruct staticData(FLiveLinkCameraStaticData::StaticStruct());
-	FLiveLinkCameraStaticData& cameraData = *staticData.Cast<FLiveLinkCameraStaticData>();
+	FLiveLinkStaticDataStruct StaticData(FLiveLinkCameraStaticData::StaticStruct());
+	FLiveLinkCameraStaticData& CameraData = *StaticData.Cast<FLiveLinkCameraStaticData>();
 
-	if (properties)
+	if (Properties)
 	{
-		for (int i = 0; i < properties->nameCount; i++)
+		for (int Idx = 0; Idx < Properties->nameCount; Idx++)
 		{
-			cameraData.PropertyNames.Add(properties->names[i]);
+			CameraData.PropertyNames.Add(Properties->names[Idx]);
 		}
 	}
-	if (structure)
+	if (CameraStructure)
 	{
-		cameraData.bIsFieldOfViewSupported = structure->isFieldOfViewSupported;
-		cameraData.bIsAspectRatioSupported = structure->isAspectRatioSupported;
-		cameraData.bIsFocalLengthSupported = structure->isFocalLengthSupported;
-		cameraData.bIsProjectionModeSupported = structure->isProjectionModeSupported;
-		cameraData.FilmBackWidth = structure->filmBackWidth;
-		cameraData.FilmBackHeight = structure->filmBackHeight;
-		cameraData.bIsApertureSupported = structure->isApertureSupported;
-		cameraData.bIsFocusDistanceSupported = structure->isFocusDistanceSupported;
+		CameraData.bIsFieldOfViewSupported = CameraStructure->isFieldOfViewSupported;
+		CameraData.bIsAspectRatioSupported = CameraStructure->isAspectRatioSupported;
+		CameraData.bIsFocalLengthSupported = CameraStructure->isFocalLengthSupported;
+		CameraData.bIsProjectionModeSupported = CameraStructure->isProjectionModeSupported;
+		CameraData.FilmBackWidth = CameraStructure->filmBackWidth;
+		CameraData.FilmBackHeight = CameraStructure->filmBackHeight;
+		CameraData.bIsApertureSupported = CameraStructure->isApertureSupported;
+		CameraData.bIsFocusDistanceSupported = CameraStructure->isFocusDistanceSupported;
 	}
-	LiveLinkProvider->UpdateSubjectStaticData(subjectName, ULiveLinkCameraRole::StaticClass(), MoveTemp(staticData));
+	LiveLinkProvider->UpdateSubjectStaticData(SubjectName, ULiveLinkCameraRole::StaticClass(), MoveTemp(StaticData));
 }
 
-void UnrealLiveLink_UpdateCameraFrame(const char *subjectName, const double worldTime,
-	const UnrealLiveLink_Metadata *metadata, const UnrealLiveLink_PropertyValues *propValues, const UnrealLiveLink_Camera *frame)
+void UnrealLiveLink_UpdateCameraFrame(const char *SubjectName, const double WorldTime,
+	const UnrealLiveLink_Metadata *Metadata, const UnrealLiveLink_PropertyValues *PropValues, const UnrealLiveLink_Camera *Frame)
 {
-	FLiveLinkFrameDataStruct frameData(FLiveLinkCameraFrameData::StaticStruct());
-	FLiveLinkCameraFrameData& CameraData = *frameData.Cast<FLiveLinkCameraFrameData>();
+	FLiveLinkFrameDataStruct FrameData(FLiveLinkCameraFrameData::StaticStruct());
+	FLiveLinkCameraFrameData& CameraData = *FrameData.Cast<FLiveLinkCameraFrameData>();
 
-	CameraData.FieldOfView = frame->fieldOfView;
-	CameraData.AspectRatio = frame->aspectRatio;
-	CameraData.FocalLength = frame->focalLength;
-	CameraData.Aperture = frame->aperture;
-	CameraData.FocusDistance = frame->focusDistance;
-	CameraData.ProjectionMode = frame->isPerspective ? ELiveLinkCameraProjectionMode::Perspective : ELiveLinkCameraProjectionMode::Orthographic;
+	CameraData.FieldOfView = Frame->fieldOfView;
+	CameraData.AspectRatio = Frame->aspectRatio;
+	CameraData.FocalLength = Frame->focalLength;
+	CameraData.Aperture = Frame->aperture;
+	CameraData.FocusDistance = Frame->focusDistance;
+	CameraData.ProjectionMode = Frame->isPerspective ? ELiveLinkCameraProjectionMode::Perspective : ELiveLinkCameraProjectionMode::Orthographic;
 
-	SetFTransform(CameraData.Transform, frame->transform);
+	SetFTransform(CameraData.Transform, Frame->transform);
 
-	SetBasicFrameParameters(subjectName, worldTime, metadata, propValues, frameData);
+	SetBasicFrameParameters(SubjectName, WorldTime, Metadata, PropValues, FrameData);
 
-	LiveLinkProvider->UpdateSubjectFrameData(subjectName, MoveTemp(frameData));
+	LiveLinkProvider->UpdateSubjectFrameData(SubjectName, MoveTemp(FrameData));
 }
 
 
 void UnrealLiveLink_SetLightStructure(
-	const char *subjectName, const UnrealLiveLink_Properties *properties, UnrealLiveLink_LightStatic *structure)
+	const char *SubjectName, const UnrealLiveLink_Properties *Properties, UnrealLiveLink_LightStatic *LightStructure)
 {
-	FLiveLinkStaticDataStruct staticData(FLiveLinkLightStaticData::StaticStruct());
-	FLiveLinkLightStaticData& lightData = *staticData.Cast<FLiveLinkLightStaticData>();
+	FLiveLinkStaticDataStruct StaticData(FLiveLinkLightStaticData::StaticStruct());
+	FLiveLinkLightStaticData& LightData = *StaticData.Cast<FLiveLinkLightStaticData>();
 
-	if (properties)
+	if (Properties)
 	{
-		for (int i = 0; i < properties->nameCount; i++)
+		for (int Idx = 0; Idx < Properties->nameCount; Idx++)
 		{
-			lightData.PropertyNames.Add(properties->names[i]);
+			LightData.PropertyNames.Add(Properties->names[Idx]);
 		}
 	}
-	if (structure)
+	if (LightStructure)
 	{
-		lightData.bIsTemperatureSupported = structure->isTemperatureSupported;
-		lightData.bIsIntensitySupported = structure->isIntensitySupported;
-		lightData.bIsLightColorSupported = structure->isLightColorSupported;
-		lightData.bIsInnerConeAngleSupported = structure->isInnerConeAngleSupported;
-		lightData.bIsOuterConeAngleSupported = structure->isOuterConeAngleSupported;
-		lightData.bIsAttenuationRadiusSupported = structure->isAttenuationRadiusSupported;
-		lightData.bIsSourceLenghtSupported = structure->isSourceLengthSupported;
-		lightData.bIsSourceRadiusSupported = structure->isSourceRadiusSupported;
-		lightData.bIsSoftSourceRadiusSupported = structure->isSoftSourceRadiusSupported;
+		LightData.bIsTemperatureSupported = LightStructure->isTemperatureSupported;
+		LightData.bIsIntensitySupported = LightStructure->isIntensitySupported;
+		LightData.bIsLightColorSupported = LightStructure->isLightColorSupported;
+		LightData.bIsInnerConeAngleSupported = LightStructure->isInnerConeAngleSupported;
+		LightData.bIsOuterConeAngleSupported = LightStructure->isOuterConeAngleSupported;
+		LightData.bIsAttenuationRadiusSupported = LightStructure->isAttenuationRadiusSupported;
+		LightData.bIsSourceLenghtSupported = LightStructure->isSourceLengthSupported;
+		LightData.bIsSourceRadiusSupported = LightStructure->isSourceRadiusSupported;
+		LightData.bIsSoftSourceRadiusSupported = LightStructure->isSoftSourceRadiusSupported;
 	}
 
-	LiveLinkProvider->UpdateSubjectStaticData(subjectName, ULiveLinkLightRole::StaticClass(), MoveTemp(staticData));
+	LiveLinkProvider->UpdateSubjectStaticData(SubjectName, ULiveLinkLightRole::StaticClass(), MoveTemp(StaticData));
 }
 
-void UnrealLiveLink_UpdateLightFrame(const char *subjectName, const double worldTime,
-	const UnrealLiveLink_Metadata *metadata, const UnrealLiveLink_PropertyValues *propValues, const UnrealLiveLink_Light *frame)
+void UnrealLiveLink_UpdateLightFrame(const char *SubjectName, const double WorldTime,
+	const UnrealLiveLink_Metadata *Metadata, const UnrealLiveLink_PropertyValues *PropValues, const UnrealLiveLink_Light *Frame)
 {
-	FLiveLinkFrameDataStruct frameData(FLiveLinkLightFrameData::StaticStruct());
-	FLiveLinkLightFrameData& lightData = *frameData.Cast<FLiveLinkLightFrameData>();
+	FLiveLinkFrameDataStruct FrameData(FLiveLinkLightFrameData::StaticStruct());
+	FLiveLinkLightFrameData& LightData = *FrameData.Cast<FLiveLinkLightFrameData>();
 
-	lightData.Temperature = frame->temperature;
-	lightData.Intensity = frame->intensity;
-	lightData.LightColor.R = frame->lightColor[0];
-	lightData.LightColor.G = frame->lightColor[1];
-	lightData.LightColor.B = frame->lightColor[2];
-	lightData.LightColor.A = 255;
-	lightData.InnerConeAngle = frame->innerConeAngle;
-	lightData.OuterConeAngle = frame->outerConeAngle;
-	lightData.AttenuationRadius = frame->attenuationRadius;
-	lightData.SourceRadius = frame->sourceRadius;
-	lightData.SoftSourceRadius = frame->softSourceRadius;
-	lightData.SourceLength = frame->sourceLength;
+	LightData.Temperature = Frame->temperature;
+	LightData.Intensity = Frame->intensity;
+	LightData.LightColor.R = Frame->lightColor[0];
+	LightData.LightColor.G = Frame->lightColor[1];
+	LightData.LightColor.B = Frame->lightColor[2];
+	LightData.LightColor.A = 255;
+	LightData.InnerConeAngle = Frame->innerConeAngle;
+	LightData.OuterConeAngle = Frame->outerConeAngle;
+	LightData.AttenuationRadius = Frame->attenuationRadius;
+	LightData.SourceRadius = Frame->sourceRadius;
+	LightData.SoftSourceRadius = Frame->softSourceRadius;
+	LightData.SourceLength = Frame->sourceLength;
 
-	SetFTransform(lightData.Transform, frame->transform);
+	SetFTransform(LightData.Transform, Frame->transform);
 
-	SetBasicFrameParameters(subjectName, worldTime, metadata, propValues, frameData);
+	SetBasicFrameParameters(SubjectName, WorldTime, Metadata, PropValues, FrameData);
 	
-	LiveLinkProvider->UpdateSubjectFrameData(subjectName, MoveTemp(frameData));
+	LiveLinkProvider->UpdateSubjectFrameData(SubjectName, MoveTemp(FrameData));
 }
 
