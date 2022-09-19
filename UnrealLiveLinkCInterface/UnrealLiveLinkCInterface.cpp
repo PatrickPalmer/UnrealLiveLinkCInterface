@@ -299,14 +299,14 @@ void UnrealLiveLink_SetCameraStructure(
 	}
 	if (CameraStructure)
 	{
-		CameraData.bIsFieldOfViewSupported = CameraStructure->isFieldOfViewSupported;
-		CameraData.bIsAspectRatioSupported = CameraStructure->isAspectRatioSupported;
-		CameraData.bIsFocalLengthSupported = CameraStructure->isFocalLengthSupported;
-		CameraData.bIsProjectionModeSupported = CameraStructure->isProjectionModeSupported;
+		CameraData.bIsFieldOfViewSupported = CameraStructure->isFieldOfViewSupported != 0;
+		CameraData.bIsAspectRatioSupported = CameraStructure->isAspectRatioSupported != 0;
+		CameraData.bIsFocalLengthSupported = CameraStructure->isFocalLengthSupported != 0;
+		CameraData.bIsProjectionModeSupported = CameraStructure->isProjectionModeSupported != 0;
 		CameraData.FilmBackWidth = CameraStructure->filmBackWidth;
 		CameraData.FilmBackHeight = CameraStructure->filmBackHeight;
-		CameraData.bIsApertureSupported = CameraStructure->isApertureSupported;
-		CameraData.bIsFocusDistanceSupported = CameraStructure->isFocusDistanceSupported;
+		CameraData.bIsApertureSupported = CameraStructure->isApertureSupported != 0;
+		CameraData.bIsFocusDistanceSupported = CameraStructure->isFocusDistanceSupported != 0;
 	}
 	LiveLinkProvider->UpdateSubjectStaticData(SubjectName, ULiveLinkCameraRole::StaticClass(), MoveTemp(StaticData));
 }
@@ -347,15 +347,15 @@ void UnrealLiveLink_SetLightStructure(
 	}
 	if (LightStructure)
 	{
-		LightData.bIsTemperatureSupported = LightStructure->isTemperatureSupported;
-		LightData.bIsIntensitySupported = LightStructure->isIntensitySupported;
-		LightData.bIsLightColorSupported = LightStructure->isLightColorSupported;
-		LightData.bIsInnerConeAngleSupported = LightStructure->isInnerConeAngleSupported;
-		LightData.bIsOuterConeAngleSupported = LightStructure->isOuterConeAngleSupported;
-		LightData.bIsAttenuationRadiusSupported = LightStructure->isAttenuationRadiusSupported;
-		LightData.bIsSourceLenghtSupported = LightStructure->isSourceLengthSupported;
-		LightData.bIsSourceRadiusSupported = LightStructure->isSourceRadiusSupported;
-		LightData.bIsSoftSourceRadiusSupported = LightStructure->isSoftSourceRadiusSupported;
+		LightData.bIsTemperatureSupported = LightStructure->isTemperatureSupported != 0;
+		LightData.bIsIntensitySupported = LightStructure->isIntensitySupported != 0;
+		LightData.bIsLightColorSupported = LightStructure->isLightColorSupported != 0;
+		LightData.bIsInnerConeAngleSupported = LightStructure->isInnerConeAngleSupported != 0;
+		LightData.bIsOuterConeAngleSupported = LightStructure->isOuterConeAngleSupported != 0;
+		LightData.bIsAttenuationRadiusSupported = LightStructure->isAttenuationRadiusSupported != 0;
+		LightData.bIsSourceLenghtSupported = LightStructure->isSourceLengthSupported != 0;
+		LightData.bIsSourceRadiusSupported = LightStructure->isSourceRadiusSupported != 0;
+		LightData.bIsSoftSourceRadiusSupported = LightStructure->isSoftSourceRadiusSupported != 0;
 	}
 
 	LiveLinkProvider->UpdateSubjectStaticData(SubjectName, ULiveLinkLightRole::StaticClass(), MoveTemp(StaticData));
