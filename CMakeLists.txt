@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.13)
 
-project(UnrealLiveLinkCInterfaceAPI VERSION 1.5.1 DESCRIPTION "Unreal Live Link C Interface")
+project(UnrealLiveLinkCInterfaceAPI VERSION 1.5.2 DESCRIPTION "Unreal Live Link C Interface")
 
 OPTION(BUILD_EXAMPLES "Build examples" OFF)
 
