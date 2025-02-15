@@ -15,11 +15,19 @@ extern "C"
 {
 #endif
 
+APICALL void UnrealLiveLink_Initialize();
+
 APICALL int UnrealLiveLink_GetVersion();
 
-APICALL int UnrealLiveLink_InitializeMessagingInterface(const char *InterfaceName);
+APICALL void UnrealLiveLink_SetProviderName(const char *ProviderName);
 
-APICALL int UnrealLiveLink_UninitializeMessagingInterface();
+APICALL int UnrealLiveLink_StartLiveLink();
+
+APICALL int UnrealLiveLink_StopLiveLink();
+
+APICALL void UnrealLiveLink_SetUnicastEndpoint(const char* Endpoint);
+APICALL int UnrealLiveLink_AddStaticEndpoint(const char* Endpoint);
+APICALL int UnrealLiveLink_RemoveStaticEndpoint(const char* Endpoint);
 
 APICALL void UnrealLiveLink_RegisterConnectionUpdateCallback(void (*Callback)());
 
@@ -29,7 +37,6 @@ APICALL void UnrealLiveLink_SetBasicStructure(const char *SubjectName, const Unr
 APICALL void UnrealLiveLink_UpdateBasicFrame(const char *SubjectName, const double WorldTime,
 	const UnrealLiveLink_Metadata *Metadata, const UnrealLiveLink_PropertyValues *PropValues);
 
-APICALL void UnrealLiveLink_DefaultAnimationStructure(const char *Name, const UnrealLiveLink_Properties *Properties);
 APICALL void UnrealLiveLink_SetAnimationStructure(
 	const char *SubjectName, const UnrealLiveLink_Properties *Properties, UnrealLiveLink_AnimationStatic *AnimStructure);
 APICALL void UnrealLiveLink_UpdateAnimationFrame(const char *SubjectName, const double WorldTime,

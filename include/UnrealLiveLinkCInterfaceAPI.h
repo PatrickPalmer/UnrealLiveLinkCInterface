@@ -34,44 +34,63 @@ extern "C"
  * load the Unreal Live Link C Interface shared object
  * for the load to succeed, the Unreal Live Link C Interface version must match
  * @param cInterfaceSharedObjectFilename shared object filename
- * @param interfaceName name of Live Link interface appearing in Unreal
  * @return results (success returns UNREAL_LIVE_LINK_OK)
  */
-extern int UnrealLiveLink_Load(const char *cInterfaceSharedObjectFilename, const char *interfaceName);
+extern int UnrealLiveLink_Load(const char *cInterfaceSharedObjectFilename);
 
 /**
  * if Unreal Live Link C Interface shared object is loaded
- * @returns UNREAL_LIVE_LINK_OK if loaded, UNREADL_LIVE_LINK_NOT_LOADED if not
+ * @returns UNREAL_LIVE_LINK_OK if loaded, UNREAD_LIVE_LINK_NOT_LOADED if not
  */
-extern int UnrealLiveLink_IsLoaded();
+extern int UnrealLiveLink_IsLoaded(void);
 
 /**
  * unload Unreal Live Link C Interface shared object
  */
-extern void UnrealLiveLink_Unload();
+extern void UnrealLiveLink_Unload(void);
+
+/**
+ * set the name of the Message Bus Provider
+ * @param providerName name of Live Link interface appearing in Unreal
+ */
+extern void (*UnrealLiveLink_SetProviderName)(const char *providerName);
 
 /**
  * get the current version of the Unreal Live Link C Interface
  * the version integer is specific to this API and not matching against Unreal Versions
  * @return version of the Unreal Live Link C Interface (UNREAL_LIVE_LINK_API_VERSION value at compile time)
  */
-extern int (*UnrealLiveLink_GetVersion)();
+extern int (*UnrealLiveLink_GetVersion)(void);
 
 /**
- * initialize message interface
- * automatically called by UnrealLiveLink_Load() so user does not need to call directly
- * @param interfaceName name of Live Link interface appearing in Unreal
+ * start live link connection
  * @return results (success returns UNREAL_LIVE_LINK_OK)
  */
-extern int (*UnrealLiveLink_InitializeMessagingInterface)(const char *interfaceName);
+extern int (*UnrealLiveLink_StartLiveLink)(void);
 
 /**
- * uninitialize message interface
- * automatically called by UnrealLiveLink_Unload() so user does not need to call directly
- * @param interfaceName name of Live Link interface appearing in Unreal
+ * stop live link connection
  * @return results (success returns UNREAL_LIVE_LINK_OK)
  */
-extern int (*UnrealLiveLink_UninitializeMessagingInterface)();
+extern int (*UnrealLiveLink_StopLiveLink)(void);
+
+/**
+ * set a unicast endpoint
+ * @return results (success returns UNREAL_LIVE_LINK_OK)
+ */
+extern void (*UnrealLiveLink_SetUnicastEndpoint)(const char* Endpoint);
+
+/**
+ * add a static endpoint
+ * @return results (success returns UNREAL_LIVE_LINK_OK)
+ */
+extern int (*UnrealLiveLink_AddStaticEndpoint)(const char* Endpoint);
+
+/**
+ * remove a static endpoint
+ * @return results (success returns UNREAL_LIVE_LINK_OK)
+ */
+extern int (*UnrealLiveLink_RemoveStaticEndpoint)(const char* Endpoint);
 
 /**
  * register a function callback if the connection to Unreal changes
@@ -81,7 +100,7 @@ extern void (*UnrealLiveLink_RegisterConnectionUpdateCallback)(void (*callback)(
 
 /**
  * connection with Unreal?
- * @return UNREAL_LIVE_LINK_OK if connected, UNREADL_LIVE_LINK_NOT_CONNECTED if not
+ * @return UNREAL_LIVE_LINK_OK if connected, UNREAD_LIVE_LINK_NOT_CONNECTED if not
  */
 extern int (*UnrealLiveLink_HasConnection)();
 

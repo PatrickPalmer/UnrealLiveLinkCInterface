@@ -67,7 +67,15 @@ int main()
 	rc = UnrealLiveLink_Load(sharedObj, "CirclingTransform");
 	if (rc != UNREAL_LIVE_LINK_OK) 
 	{
-		printf("error: unable to load %s\n", sharedObj);
+		printf("error: unable to load %s (error %d)\n", sharedObj, rc);
+		return 1;
+	}
+
+	UnrealLiveLink_SetProviderName("CirclingTransform");
+	rc = UnrealLiveLink_StartLiveLink();
+	if (rc != UNREAL_LIVE_LINK_OK) 
+	{
+		printf("error: unable to start live link (error %d)\n", rc);
 		return 1;
 	}
 

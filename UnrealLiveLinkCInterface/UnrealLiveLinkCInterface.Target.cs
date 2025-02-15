@@ -14,15 +14,12 @@ public class UnrealLiveLinkCInterfaceTarget : TargetRules
             // Lean and mean
             bBuildDeveloperTools = false;
 
-            // We only need minimal use of the engine for this plugin
-            bUseMallocProfiler = false;
-
             bBuildWithEditorOnlyData = true;
             bCompileAgainstEngine = false;
             bCompileAgainstCoreUObject = true;
             bCompileICU = false;
-            //bHasExports = true;
 
-        }
+			IncludeOrderVersion = EngineIncludeOrderVersion.Latest;
+	}
 }
 

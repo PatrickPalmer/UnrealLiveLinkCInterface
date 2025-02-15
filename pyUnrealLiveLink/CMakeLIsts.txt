@@ -1,0 +1,47 @@
+
+cmake_minimum_required(VERSION 3.30)
+
+project(pyUnrealLiveLink)
+
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+set(CMAKE_CXX_STANDARD 20)
+
+find_package(Python 3.11 EXACT COMPONENTS Interpreter Development)
+if (NOT Python_FOUND)
+    message("WARNING: Unable to build Python module. Skipping.")
+    RETURN()
+ENDIF()
+
+message("Python executable found here: " ${Python_EXECUTABLE})
+include_directories( ${Python_INCLUDE_DIRS} )
+
+SET(PYBIND11_FINDPYTHON OFF)
+add_subdirectory(pybind11)
+#FIND_PACKAGE(PyBind REQUIRED)
+
+include_directories(${PYBIND11_INCLUDE_DIR})
+
+
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../lib
+	${CMAKE_CURRENT_SOURCE_DIR}/../include
+	${CMAKE_CURRENT_SOURCE_DIR}/../src
+	${CMAKE_CURRENT_BINARY_DIR}/..)
+
+add_library(${PROJECT_NAME} SHARED module.cpp)
+
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} UnrealLiveLinkCInterfaceAPI ${Python_LIBRARIES})
+
+if (WIN32)
+    set_target_properties(${PROJECT_NAME} 
+        PROPERTIES 
+            COMPILE_FLAGS "/Zc:wchar_t-"
+            SUFFIX ".pyd"
+    )
+endif(WIN32)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
+
+#install(TARGETS ${PROJECT_NAME} DESTINATION ${HDPS_INSTALL_DIR}/python/hdps/pynodeflow)
+
+

@@ -1,8 +1,9 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.30)
 
-project(UnrealLiveLinkCInterfaceAPI VERSION 1.5.2 DESCRIPTION "Unreal Live Link C Interface")
+project(UnrealLiveLinkCInterfaceAPI VERSION 2.0.0 DESCRIPTION "Unreal Live Link C Interface")
 
 OPTION(BUILD_EXAMPLES "Build examples" OFF)
+OPTION(BUILD_PYTHON_MODULE "Build Python Module" ON)
 
 add_library(${PROJECT_NAME} STATIC src/UnrealLiveLinkCInterfaceAPI.c)
 
@@ -14,6 +15,10 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC
         ${PROJECT_SOURCE_DIR}/include
 )
+
+if (BUILD_PYTHON_MODULE)
+    ADD_SUBDIRECTORY(pyUnrealLiveLink)
+endif(BUILD_PYTHON_MODULE)
 
 if (BUILD_EXAMPLES)
     ADD_SUBDIRECTORY(examples)

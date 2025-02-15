@@ -18,6 +18,9 @@
 #include "Roles/LiveLinkLightTypes.h"
 #include "Roles/LiveLinkTransformRole.h"
 #include "Roles/LiveLinkTransformTypes.h"
+#include "Features/IModularFeatures.h"
+#include "INetworkMessagingExtension.h"
+#include "Shared/UdpMessagingSettings.h"
 #include "UObject/Object.h"
 
 //#include <cstdio>
@@ -26,13 +29,13 @@ DEFINE_LOG_CATEGORY_STATIC(LogUnrealLiveLinkCInterface, Log, All);
 
 IMPLEMENT_APPLICATION(UnrealLiveLinkCInterface, "UnrealLiveLinkCInterface");
 
-class FLiveLinkStreamedSubjectManager;
+TSharedPtr<ILiveLinkProvider> LiveLinkProvider = nullptr;
+FString LiveLinkProviderName = "";
 
-TSharedPtr<ILiveLinkProvider> LiveLinkProvider;
-TSharedPtr<FLiveLinkStreamedSubjectManager> LiveLinkStreamManager;
-FDelegateHandle ConnectionStatusChangedHandle;
+FDelegateHandle ConnectionStatusChangedHandle{};
 
-TArray<void(*)()> ConnectionCallbacks;
+TArray<void(*)()> ConnectionCallbacks{};
+
 
 int32_t TimecodeRates[UNREAL_LIVE_LINK_TIMECODE_120 + 1][2] = {
 		{ 0, 0 },		// unknown
@@ -72,43 +75,57 @@ static void OnConnectionStatusChanged()
 	}
 }
 
+void UnrealLiveLink_Initialize()
+{
+	GEngineLoop.PreInit(TEXT("MobuLiveLinkPlugin -Messaging"));
+
+	// ensure target platform manager is referenced early as it must be created on the main thread
+	GetTargetPlatformManager();
+
+	ProcessNewlyLoadedUObjects();
+
+	// Tell the module manager that it may now process newly-loaded UObjects when new C++ modules are loaded
+	FModuleManager::Get().StartProcessingNewlyLoadedObjects();
+	FModuleManager::Get().LoadModule(TEXT("UdpMessaging"));
+
+	IPluginManager::Get().LoadModulesForEnabledPlugins(ELoadingPhase::PreDefault);
+	IPluginManager::Get().LoadModulesForEnabledPlugins(ELoadingPhase::Default);
+	IPluginManager::Get().LoadModulesForEnabledPlugins(ELoadingPhase::PostDefault);
+}
+
 int UnrealLiveLink_GetVersion()
 {
 	return UNREAL_LIVE_LINK_API_VERSION;
 }
 
-int UnrealLiveLink_InitializeMessagingInterface(const char *InterfaceName)
+void UnrealLiveLink_SetProviderName(const char* ProviderName)
 {
-	// SET UP
-	GEngineLoop.PreInit(TEXT("UnrealLiveLinkCInterface -Messaging"));
-	ProcessNewlyLoadedUObjects();
+	LiveLinkProviderName = ANSI_TO_TCHAR(ProviderName);
+}
 
-	// Tell the module manager now process newly-loaded UObjects when new C++ modules are loaded
-	FModuleManager::Get().StartProcessingNewlyLoadedObjects();
+int UnrealLiveLink_StartLiveLink()
+{
+	if (LiveLinkProviderName.IsEmpty())
+	{
+		LiveLinkProviderName = "C Interface";
+	}
 
-	FModuleManager::Get().LoadModule(TEXT("UdpMessaging"));
+	if (LiveLinkProvider != nullptr)
+	{
+		UE_LOG(LogUnrealLiveLinkCInterface, Display, TEXT("Live Link C Interface already Initialized"));
+		return UNREAL_LIVE_LINK_FAILED;
+	}
 
-	GLog->TearDown();
-
-	LiveLinkProvider = ILiveLinkProvider::CreateLiveLinkProvider(ANSI_TO_TCHAR(InterfaceName));
+	LiveLinkProvider = ILiveLinkProvider::CreateLiveLinkProvider(LiveLinkProviderName);
 	ConnectionStatusChangedHandle = LiveLinkProvider->RegisterConnStatusChangedHandle(FLiveLinkProviderConnectionStatusChanged::FDelegate::CreateStatic(&OnConnectionStatusChanged));
-
-	// We do not tick the core engine but we need to tick the ticker to make sure the message bus endpoint in LiveLinkProvider is
-	// up to date
-	FTicker::GetCoreTicker().Tick(1.f);
-
-#ifdef TODO
-	LiveLinkStreamManager = MakeShareable(new FLiveLinkStreamedSubjectManager());
-#endif
 
 	UE_LOG(LogUnrealLiveLinkCInterface, Display, TEXT("Live Link C Interface Initialized"));
 
 	return UNREAL_LIVE_LINK_OK;
 }
 
-int UnrealLiveLink_UninitializeMessagingInterface()
+int UnrealLiveLink_StopLiveLink()
 {
-	// TEAR DOWN
 	UE_LOG(LogUnrealLiveLinkCInterface, Display, TEXT("Live Link C Interface Shutting Down"));
 
 	if (ConnectionStatusChangedHandle.IsValid())
@@ -117,12 +134,68 @@ int UnrealLiveLink_UninitializeMessagingInterface()
 		ConnectionStatusChangedHandle.Reset();
 	}
 
-	FTicker::GetCoreTicker().Tick(1.f);
+	FTSTicker::GetCoreTicker().Tick(1.0f);
 
-	LiveLinkProvider = nullptr;
+	if (LiveLinkProvider != nullptr)
+	{
+		UE_LOG(LogUnrealLiveLinkCInterface, Display, TEXT("LiveLinkProvider References: %d"), LiveLinkProvider.GetSharedReferenceCount());
+		LiveLinkProvider = nullptr;
+	}
 
 	return UNREAL_LIVE_LINK_OK;
 }
+
+static FString GetUnicastEndpoint() 
+{
+	if (IModularFeatures::Get().IsModularFeatureAvailable(INetworkMessagingExtension::ModularFeatureName))
+	{
+		UUdpMessagingSettings* Settings = GetMutableDefault<UUdpMessagingSettings>();
+		return Settings->UnicastEndpoint;
+	}
+
+	return TEXT("0.0.0.0:0");
+}
+
+void UnrealLiveLink_SetUnicastEndpoint(const char * InEndpoint)
+{
+	if (InEndpoint != GetUnicastEndpoint())
+	{
+		if (IModularFeatures::Get().IsModularFeatureAvailable(INetworkMessagingExtension::ModularFeatureName))
+		{
+			UnrealLiveLink_StopLiveLink();
+
+			UUdpMessagingSettings* Settings = GetMutableDefault<UUdpMessagingSettings>();
+			Settings->UnicastEndpoint = InEndpoint;
+			INetworkMessagingExtension& NetworkExtension = IModularFeatures::Get().GetModularFeature<INetworkMessagingExtension>(INetworkMessagingExtension::ModularFeatureName);
+			NetworkExtension.RestartServices();
+
+			UnrealLiveLink_StartLiveLink();
+		}
+	}
+}
+
+int UnrealLiveLink_AddStaticEndpoint(const char * InEndpoint)
+{
+	if (IModularFeatures::Get().IsModularFeatureAvailable(INetworkMessagingExtension::ModularFeatureName))
+	{
+		INetworkMessagingExtension& NetworkExtension = IModularFeatures::Get().GetModularFeature<INetworkMessagingExtension>(INetworkMessagingExtension::ModularFeatureName);
+		NetworkExtension.AddEndpoint(InEndpoint);
+		return UNREAL_LIVE_LINK_OK;
+	}
+	return UNREAL_LIVE_LINK_FAILED;
+}
+
+int UnrealLiveLink_RemoveStaticEndpoint(const char * InEndpoint)
+{
+	if (IModularFeatures::Get().IsModularFeatureAvailable(INetworkMessagingExtension::ModularFeatureName))
+	{
+		INetworkMessagingExtension& NetworkExtension = IModularFeatures::Get().GetModularFeature<INetworkMessagingExtension>(INetworkMessagingExtension::ModularFeatureName);
+		NetworkExtension.RemoveEndpoint(InEndpoint);
+		return UNREAL_LIVE_LINK_OK;
+	}
+	return UNREAL_LIVE_LINK_FAILED;
+}
+
 
 void UnrealLiveLink_RegisterConnectionUpdateCallback(void (*Callback)())
 {
