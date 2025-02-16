@@ -16,6 +16,7 @@ extern "C"
 #endif
 
 APICALL void UnrealLiveLink_Initialize();
+APICALL void UnrealLiveLink_Shutdown();
 
 APICALL int UnrealLiveLink_GetVersion();
 

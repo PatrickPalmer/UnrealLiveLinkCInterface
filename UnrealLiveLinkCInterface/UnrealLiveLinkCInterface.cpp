@@ -77,7 +77,7 @@ static void OnConnectionStatusChanged()
 
 void UnrealLiveLink_Initialize()
 {
-	GEngineLoop.PreInit(TEXT("MobuLiveLinkPlugin -Messaging"));
+	GEngineLoop.PreInit(TEXT("UnrealLiveLinkCInterface -Messaging"));
 
 	// ensure target platform manager is referenced early as it must be created on the main thread
 	GetTargetPlatformManager();
@@ -91,6 +91,14 @@ void UnrealLiveLink_Initialize()
 	IPluginManager::Get().LoadModulesForEnabledPlugins(ELoadingPhase::PreDefault);
 	IPluginManager::Get().LoadModulesForEnabledPlugins(ELoadingPhase::Default);
 	IPluginManager::Get().LoadModulesForEnabledPlugins(ELoadingPhase::PostDefault);
+}
+
+void UnrealLiveLink_Shutdown()
+{
+	RequestEngineExit(TEXT("UnrealLiveLinkCInterface unloading"));
+	FEngineLoop::AppPreExit();
+	FModuleManager::Get().UnloadModulesAtShutdown();
+	FEngineLoop::AppExit();
 }
 
 int UnrealLiveLink_GetVersion()
@@ -136,9 +144,10 @@ int UnrealLiveLink_StopLiveLink()
 
 	FTSTicker::GetCoreTicker().Tick(1.0f);
 
-	if (LiveLinkProvider != nullptr)
+	if (LiveLinkProvider.IsValid())
 	{
-		UE_LOG(LogUnrealLiveLinkCInterface, Display, TEXT("LiveLinkProvider References: %d"), LiveLinkProvider.GetSharedReferenceCount());
+		//UE_LOG(LogUnrealLiveLinkCInterface, Display, TEXT("LiveLinkProvider References: %d"), LiveLinkProvider.GetSharedReferenceCount());
+		LiveLinkProvider.Reset();
 		LiveLinkProvider = nullptr;
 	}
 

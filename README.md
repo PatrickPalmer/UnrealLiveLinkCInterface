@@ -1,7 +1,7 @@
 # Unreal Live Link C interface
 Version 2.0.0
 
-For Unreal Engine v5.4 or greater.
+For Unreal Engine v5.3 or greater.
 
 ## Overview
 
@@ -24,6 +24,8 @@ Building the Unreal Live Link C Interface plugin DLL requires the Unreal Engine 
  * load UE5.sln in Visual Studio 2022
  * build
  * the DLL can be found at [UNREAL_ENGINE_SRC_LOCATION]\Engine\Binaries\Win64\UnrealLiveLinkCInterface.dll
+
+Note, copying just the dll may not be enough. There may be other dependencies that need to be copied such as the tbbmalloc.dll. Use the [Dependencies](https://github.com/lucasg/Dependencies) application to determine what additional dlls are needed.
 
 ### Building the library
 
@@ -54,11 +56,11 @@ Once you have your IPv4 values, you can then proceed to set up the link dependin
 * In Unreal, open the Project Settings and go to the UDP Messaging section.
 * Enter the IPv4 value into C Interface Library and Unreal based on the following scenarios:
 
-  * If you want C Interface Library to keep track the various instances of Unreal that it should connect to:
+  a. If you want C Interface Library to keep track the various instances of Unreal that it should connect to:
     1. Input the target IPv4 into Unreal's Unicast Endpoint field.
     2. Add that same value to the list of C Interface Library's Static Endpoints function.
     3. Repeat this for each device running Unreal.
-  * If you want each instance of Unreal to keep track of the instance of C Interface Library it should connect to:
+  b. If you want each instance of Unreal to keep track of the instance of C Interface Library it should connect to:
     1. Input the IPv4 value into C Interface Library's Unicast Endpoint function.
     2. Add the same value to Unreal's Multicast Endpoint field.
     3. Repeat step 2 for each instance of Unreal.

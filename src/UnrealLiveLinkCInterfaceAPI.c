@@ -43,6 +43,7 @@
 
 /* function pointers */
 void (*UnrealLiveLink_Initialize)(void) = NULL;
+void (*UnrealLiveLink_Shutdown)(void) = NULL;
 
 int (*UnrealLiveLink_GetVersion)(void) = NULL;
 
@@ -113,8 +114,8 @@ int UnrealLiveLink_Load(const char *cInterfaceSharedObjectFilename)
 	}
 #endif
 
-	/* check API version */
 	UnrealLiveLink_Initialize = (void (*)(void)) GET_FUNC_ADDR(mod, "UnrealLiveLink_Initialize");
+	UnrealLiveLink_Shutdown = (void (*)(void)) GET_FUNC_ADDR(mod, "UnrealLiveLink_Shutdown");
 	if (UnrealLiveLink_Initialize)
 	{
 		UnrealLiveLink_Initialize();
@@ -207,6 +208,11 @@ void UnrealLiveLink_Unload(void)
 	if (UnrealLiveLink_StopLiveLink)
 	{
 		UnrealLiveLink_StopLiveLink();
+	}
+
+	if (UnrealLiveLink_Shutdown)
+	{
+		UnrealLiveLink_Shutdown();
 	}
 
 	if (UnrealLiveLink_SharedObject)
