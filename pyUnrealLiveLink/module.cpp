@@ -446,6 +446,24 @@ PYBIND11_MODULE(pyUnrealLiveLink, m) {
     m.def("get_version", []() -> int { return UnrealLiveLink_GetVersion != NULL ? UnrealLiveLink_GetVersion() : 0 ; });
     m.def("has_connection", []() -> bool { return UnrealLiveLink_HasConnection != NULL ? UnrealLiveLink_HasConnection() == UNREAL_LIVE_LINK_OK : false; });
 
+    m.def("set_unicast_endpoint", [](const std::string& endpoint) -> void { 
+        if (UnrealLiveLink_SetUnicastEndpoint != NULL) {
+            UnrealLiveLink_SetUnicastEndpoint(endpoint.c_str());
+        }
+    });
+    m.def("add_static_endpoint", [](const std::string& endpoint) -> int { 
+        if (UnrealLiveLink_AddStaticEndpoint != NULL) {
+            return UnrealLiveLink_AddStaticEndpoint(endpoint.c_str());
+        }
+        return UNREAL_LIVE_LINK_NOT_LOADED;
+    });
+    m.def("remove_static_endpoint", [](const std::string& endpoint) -> int { 
+        if (UnrealLiveLink_RemoveStaticEndpoint != NULL) {
+            return UnrealLiveLink_RemoveStaticEndpoint(endpoint.c_str());
+        }
+        return UNREAL_LIVE_LINK_NOT_LOADED;
+    });
+
     m.def("start_live_link", []() -> int { return UnrealLiveLink_StartLiveLink != NULL ? UnrealLiveLink_StartLiveLink() : UNREAL_LIVE_LINK_NOT_LOADED ; });
     m.def("stop_live_link", []() -> int { return UnrealLiveLink_StopLiveLink != NULL ? UnrealLiveLink_StopLiveLink() : UNREAL_LIVE_LINK_NOT_LOADED ; });
 
