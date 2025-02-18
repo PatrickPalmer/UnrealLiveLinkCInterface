@@ -23,7 +23,6 @@
 #include "Shared/UdpMessagingSettings.h"
 #include "UObject/Object.h"
 
-//#include <cstdio>
 
 DEFINE_LOG_CATEGORY_STATIC(LogUnrealLiveLinkCInterface, Log, All);
 
@@ -126,6 +125,8 @@ int UnrealLiveLink_StartLiveLink()
 
 	LiveLinkProvider = ILiveLinkProvider::CreateLiveLinkProvider(LiveLinkProviderName);
 	ConnectionStatusChangedHandle = LiveLinkProvider->RegisterConnStatusChangedHandle(FLiveLinkProviderConnectionStatusChanged::FDelegate::CreateStatic(&OnConnectionStatusChanged));
+
+	FTSTicker::GetCoreTicker().Tick(1.0f);
 
 	UE_LOG(LogUnrealLiveLinkCInterface, Display, TEXT("Live Link C Interface Initialized"));
 
@@ -321,9 +322,7 @@ void UnrealLiveLink_UpdateAnimationFrame(const char *SubjectName, const double W
 		FTransform UETrans;
 
 		UETrans.SetRotation(FQuat(Transform.rotation[0], Transform.rotation[1], Transform.rotation[2], Transform.rotation[3]));
-
 		UETrans.SetTranslation(FVector(Transform.translation[0], Transform.translation[1], Transform.translation[2]));
-
 		UETrans.SetScale3D(FVector(Transform.scale[0], Transform.scale[1], Transform.scale[2]));
 
 		AnimData.Transforms.Add(UETrans);

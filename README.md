@@ -7,7 +7,9 @@ For Unreal Engine v5.3 or greater.
 
 This small library provides a C Interface to the Unreal Live Link Message Bus API. This allows for third party packages to stream to Unreal Live Link without requiring to compile with the Unreal Build Tool (UBT). This is done by exposing the Live Link API via a C interface in a shared object compiled using UBT. This shared object is loaded via an API and exposed functions can be called with a light weight interface.
 
-The Unreal Live Link Message Bus API is fully exposed except the per frame metadata scene time is limited to just SMPTE timecode.  
+The Unreal Live Link Message Bus API is fully exposed except the per frame metadata scene time is limited to just SMPTE timecode. 
+
+The Unreal Live Link Message Bus line protocol doesn't change that often. As such, you will find that building the Unreal DLL will work for a number of Unreal versions.
 
 ## Building
 
@@ -52,18 +54,17 @@ To find your IPv4 address:
 
 Once you have your IPv4 values, you can then proceed to set up the link depending on the two scenarios outlined below:
 
-* In C Interface library, call the appropriate C functions to set the endpoints.
-* In Unreal, open the Project Settings and go to the UDP Messaging section.
-* Enter the IPv4 value into C Interface Library and Unreal based on the following scenarios:
-
-  a. If you want C Interface Library to keep track the various instances of Unreal that it should connect to:
-    1. Input the target IPv4 into Unreal's Unicast Endpoint field.
-    2. Add that same value to the list of C Interface Library's Static Endpoints function.
-    3. Repeat this for each device running Unreal.
-  b. If you want each instance of Unreal to keep track of the instance of C Interface Library it should connect to:
-    1. Input the IPv4 value into C Interface Library's Unicast Endpoint function.
-    2. Add the same value to Unreal's Multicast Endpoint field.
-    3. Repeat step 2 for each instance of Unreal.
+1. In C Interface library, call the appropriate C functions to set the endpoints.
+2. Project Settings and go to the UDP Messaging section.
+3. Enter the IPv4 value into C Interface Library and Unreal based on the following scenarios:
+      * If you want C Interface Library to keep track the various instances of Unreal that it should connect to:
+              1. Input the target IPv4 into Unreal's Unicast Endpoint field.
+              2. Add that same value to the list of C Interface Library's Static Endpoints function.
+              3. Repeat this for each device running Unreal.
+      * If you want each instance of Unreal to keep track of the instance of C Interface Library it should connect to:
+              1. Input the IPv4 value into C Interface Library's Unicast Endpoint function.
+              2. Add the same value to Unreal's Multicast Endpoint field.
+              3. Repeat step 2 for each instance of Unreal.
 
 ## Design considerations
 

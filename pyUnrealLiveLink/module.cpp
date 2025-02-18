@@ -98,7 +98,7 @@ struct Light
 
 static void CopyMetadata(const Metadata& metadata, UnrealLiveLink_Metadata& uellmeta)
 {
-    // XXX
+    // TODO
     uellmeta.timecode = metadata.timecode;
 }
 
@@ -287,6 +287,7 @@ static void SetAnimationStructure(const std::string& subject_name, const Propert
         UnrealLiveLink_AnimationStatic uellanim;
         uellanim.bones = bone_cache.data();
         uellanim.boneCount = animation.size();
+
         UnrealLiveLink_SetAnimationStructure(subject_name.c_str(), &uellprop, &uellanim);
     }
 }
@@ -302,9 +303,11 @@ static void UpdateAnimationFrame(const std::string & subject_name, const double 
         UnrealLiveLink_PropertyValues uellpropval;
         CopyPropertyValues(property_values, uellpropval);
 
-        auto anim_ptr = reinterpret_cast<UnrealLiveLink_Animation *>(animation.data());
+        UnrealLiveLink_Animation uellanim;
+        uellanim.transforms = reinterpret_cast<UnrealLiveLink_Transform *>(animation.data());
+        uellanim.transformCount = animation.size();
 
-        UnrealLiveLink_UpdateAnimationFrame(subject_name.c_str(), world_time, &uellmeta, &uellpropval, anim_ptr);
+        UnrealLiveLink_UpdateAnimationFrame(subject_name.c_str(), world_time, &uellmeta, &uellpropval, &uellanim);
     }
 }
 
