@@ -11,7 +11,6 @@ public class UnrealLiveLinkCInterfaceTarget : TargetRules
             bShouldCompileAsDLL = true;
             LinkType = TargetLinkType.Monolithic;
 
-            // Lean and mean
             bBuildDeveloperTools = false;
 
             bBuildWithEditorOnlyData = true;
@@ -19,7 +18,7 @@ public class UnrealLiveLinkCInterfaceTarget : TargetRules
             bCompileAgainstCoreUObject = true;
             bCompileICU = false;
 
-			IncludeOrderVersion = EngineIncludeOrderVersion.Latest;
+            IncludeOrderVersion = EngineIncludeOrderVersion.Latest;
 	}
 }
 

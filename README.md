@@ -17,7 +17,7 @@ The Unreal Live Link Message Bus line protocol doesn't change that often. As suc
 
 Building the Unreal Live Link C Interface plugin DLL requires the Unreal Engine source code. Download the source code from [github](https://github.com/EpicGames/UnrealEngine).
 
-#### Windows
+#### Windows 10/11
 
  * copy the UnrealLiveLinkCInterface directory from this repository to [UNREAL_ENGINE_SRC_LOCATION]\Engine\Source\Programs
  * copy the file include/UnrealLiveLinkCInterfaceTypes.h from this repository to [UNREAL_ENGINE_SRC_LOCATION]\Engine\Source\Programs\UnrealLiveLinkCInterface directory
@@ -29,18 +29,32 @@ Building the Unreal Live Link C Interface plugin DLL requires the Unreal Engine 
 
 Note, copying just the dll may not be enough. There may be other dependencies that need to be copied such as the tbbmalloc.dll. Use the [Dependencies](https://github.com/lucasg/Dependencies) application to determine what additional dlls are needed.
 
+
+#### Ubuntu 24.04 LTS
+
+ * copy the UnrealLiveLinkCInterface directory from this repository to [UNREAL_ENGINE_SRC_LOCATION]/Engine/Source/Programs
+ * copy the file include/UnrealLiveLinkCInterfaceTypes.h from this repository to [UNREAL_ENGINE_SRC_LOCATION]/Engine/Source/Programs/UnrealLiveLinkCInterface directory
+ * cd [UNREAL_ENGINE_SRC_LOCATION]
+ * run "./GenerateProjectFiles.sh", this creates a Makefile
+ * run "make UnrealLiveLinkCInterface"
+ * the shared object can be found at [UNREAL_ENGINE_SRC_LOCATION]/Engine/Binaries/Linux/libUnrealLiveLinkCInterface.so
+
+
 ### Building the library
 
-Building on Windows
+From the top level of the repo.
+
 ```
 mkdir build
 cd build
-cmake -G "Visual Studio 17 2022" -A x64 ..
+cmake ..
 ```
 
 Cmake Options
 * BUILD_EXAMPLES (default OFF) - build C example using the library
 * BUILD_PYTHON_MODULE (default ON) - build python module
+* PYTHON_MODULE_VERSION (default 3.11) - Python version (must be installed)
+
  
 ## Link C Interface library to specific or multiple instances of Unreal
 
@@ -82,10 +96,10 @@ To try the Circling Transform example, build with the example cmake option turne
 
 There is also a few Python examples in the pyUnrealLiveLink/examples directory.
 
-## Future work
+## TODO
 
- * linux testing
- * OSX support
+* Linux Testing
+
 
 ## Links
 

@@ -110,18 +110,30 @@ int UnrealLiveLink_Load(const char *cInterfaceSharedObjectFilename)
 	void * mod = dlopen(cInterfaceSharedObjectFilename, RTLD_LAZY);
 	if (!mod)
 	{
+		printf("UnrealLiveLink_Load: unable to load library. Error %s\n", dlerror());
 		return UNREAL_LIVE_LINK_MISSING_LIB;
 	}
 #endif
 
 	UnrealLiveLink_Initialize = (void (*)(void)) GET_FUNC_ADDR(mod, "UnrealLiveLink_Initialize");
-	UnrealLiveLink_Shutdown = (void (*)(void)) GET_FUNC_ADDR(mod, "UnrealLiveLink_Shutdown");
 	if (UnrealLiveLink_Initialize)
 	{
 		UnrealLiveLink_Initialize();
 	}
 	else
 	{
+#ifdef __linux__
+		printf("UnrealLiveLink_Load: unable to load function. Error %s\n", dlerror());
+#endif
+		return UNREAL_LIVE_LINK_INCOMPLETE;
+	}
+
+	UnrealLiveLink_Shutdown = (void (*)(void)) GET_FUNC_ADDR(mod, "UnrealLiveLink_Shutdown");
+	if (!UnrealLiveLink_Shutdown)
+	{
+#ifdef __linux__
+		printf("UnrealLiveLink_Load: unable to load function. Error %s\n", dlerror());
+#endif
 		return UNREAL_LIVE_LINK_INCOMPLETE;
 	}
 

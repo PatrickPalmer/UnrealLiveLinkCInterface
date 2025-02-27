@@ -23,10 +23,13 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
-#include "UnrealLiveLinkCInterfaceAPI.h"
 #include <string>
 #include <array>
 #include <vector>
+
+extern "C" {
+#include "UnrealLiveLinkCInterfaceAPI.h"
+}
 
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
@@ -96,9 +99,21 @@ struct Light
     float sourceLength{ 0 };
 };
 
-static void CopyMetadata(const Metadata& metadata, UnrealLiveLink_Metadata& uellmeta)
+typedef std::vector<UnrealLiveLink_KeyValue> KeyValueCache;
+
+static void CopyMetadata(const Metadata& metadata, UnrealLiveLink_Metadata& uellmeta, KeyValueCache &cache)
 {
-    // TODO
+    uellmeta.keyValueCount = metadata.keyValues.size();
+    cache.resize(metadata.keyValues.size());
+    for (size_t i = 0; i < uellmeta.keyValueCount; i++)
+    {
+        ::strncpy(cache[i].name, metadata.keyValues[i].key.c_str(), UNREAL_LIVE_LINK_MAX_NAME_LENGTH);
+        cache[i].name[UNREAL_LIVE_LINK_MAX_NAME_LENGTH - 1] = '\0';
+        ::strncpy(cache[i].value, metadata.keyValues[i].value.c_str(), UNREAL_LIVE_LINK_MAX_NAME_LENGTH);
+        cache[i].value[UNREAL_LIVE_LINK_MAX_NAME_LENGTH - 1] = '\0';
+    }
+    uellmeta.keyValues = cache.data();
+
     uellmeta.timecode = metadata.timecode;
 }
 
@@ -107,10 +122,11 @@ typedef std::vector<std::array<char, UNREAL_LIVE_LINK_MAX_NAME_LENGTH>> NameCach
 static void CopyProperties(const Properties &properties, UnrealLiveLink_Properties &uellprop, NameCache &cache)
 {
     uellprop.nameCount = properties.size();
-    cache.reserve(properties.size());
+    cache.resize(properties.size());
     for (size_t i = 0; i < uellprop.nameCount; i++)
     {
         ::strncpy(cache[i].data(), properties[i].c_str(), UNREAL_LIVE_LINK_MAX_NAME_LENGTH);
+        cache[i].data()[UNREAL_LIVE_LINK_MAX_NAME_LENGTH - 1] = '\0';
     }
     uellprop.names = reinterpret_cast<UnrealLiveLink_Name*>(cache.data());
 }
@@ -152,7 +168,8 @@ static void UpdateBasicFrame(const std::string & subject_name, const double worl
     if (UnrealLiveLink_UpdateBasicFrame != NULL)
     {
         UnrealLiveLink_Metadata uellmeta;
-        CopyMetadata(metadata, uellmeta);
+        KeyValueCache kvcache;
+        CopyMetadata(metadata, uellmeta, kvcache);
 
         UnrealLiveLink_PropertyValues uellpropval;
         CopyPropertyValues(property_values, uellpropval);
@@ -179,7 +196,8 @@ static void UpdateTransformFrame(const std::string & subject_name, const double 
     if (UnrealLiveLink_UpdateTransformFrame != NULL)
     {
         UnrealLiveLink_Metadata uellmeta;
-        CopyMetadata(metadata, uellmeta);
+        KeyValueCache kvcache;
+        CopyMetadata(metadata, uellmeta, kvcache);
 
         UnrealLiveLink_PropertyValues uellpropval;
         CopyPropertyValues(property_values, uellpropval);
@@ -209,7 +227,8 @@ static void UpdateCameraFrame(const std::string & subject_name, const double wor
     if (UnrealLiveLink_UpdateCameraFrame != NULL)
     {
         UnrealLiveLink_Metadata uellmeta;
-        CopyMetadata(metadata, uellmeta);
+        KeyValueCache kvcache;
+        CopyMetadata(metadata, uellmeta, kvcache);
 
         UnrealLiveLink_PropertyValues uellpropval;
         CopyPropertyValues(property_values, uellpropval);
@@ -245,7 +264,8 @@ static void UpdateLightFrame(const std::string & subject_name, const double worl
     if (UnrealLiveLink_UpdateBasicFrame != NULL)
     {
         UnrealLiveLink_Metadata uellmeta;
-        CopyMetadata(metadata, uellmeta);
+        KeyValueCache kvcache;
+        CopyMetadata(metadata, uellmeta, kvcache);
 
         UnrealLiveLink_PropertyValues uellpropval;
         CopyPropertyValues(property_values, uellpropval);
@@ -282,6 +302,7 @@ static void SetAnimationStructure(const std::string& subject_name, const Propert
         for (size_t i = 0; i < animation.size(); i++)
         {
             ::strncpy(bone_cache[i].name, animation[i].name.c_str(), UNREAL_LIVE_LINK_MAX_NAME_LENGTH);
+            bone_cache[i].name[UNREAL_LIVE_LINK_MAX_NAME_LENGTH - 1] = '\0';
             bone_cache[i].parentIndex = animation[i].parentIndex;
         }
         UnrealLiveLink_AnimationStatic uellanim;
@@ -298,7 +319,8 @@ static void UpdateAnimationFrame(const std::string & subject_name, const double 
     if (UnrealLiveLink_UpdateAnimationFrame != NULL)
     {
         UnrealLiveLink_Metadata uellmeta;
-        CopyMetadata(metadata, uellmeta);
+        KeyValueCache kvcache;
+        CopyMetadata(metadata, uellmeta, kvcache);
 
         UnrealLiveLink_PropertyValues uellpropval;
         CopyPropertyValues(property_values, uellpropval);
@@ -430,7 +452,7 @@ PYBIND11_MODULE(pyUnrealLiveLink, m) {
 #ifdef WIN32
         const char* sharedObj = "UnrealLiveLinkCInterface.dll";
 #else
-        const char* sharedObj = "UnrealLiveLinkCInterface.so";
+        const char* sharedObj = "libUnrealLiveLinkCInterface.so";
 #endif
         return UnrealLiveLink_Load(sharedObj);
     });

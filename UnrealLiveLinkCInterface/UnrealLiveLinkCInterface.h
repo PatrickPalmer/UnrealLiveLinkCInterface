@@ -6,7 +6,7 @@
 #ifdef WIN32
 #define APICALL __declspec(dllexport)
 #else
-#define APICALL
+#define APICALL __attribute__((visibility("default")))
 #endif
 
 

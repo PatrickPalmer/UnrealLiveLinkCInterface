@@ -57,7 +57,7 @@ int main()
 #ifdef WIN32
 	const char * sharedObj = "UnrealLiveLinkCInterface.dll";
 #else
-	const char * sharedObj = "UnrealLiveLinkCInterface.so";
+	const char * sharedObj = "libUnrealLiveLinkCInterface.so";
 	struct timespec ts;
 
 	ts.tv_sec = 0;
