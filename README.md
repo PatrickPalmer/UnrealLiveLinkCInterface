@@ -13,9 +13,9 @@ The Unreal Live Link Message Bus line protocol doesn't change that often. As suc
 
 ## Building
 
-### Building the Unreal DLL
+### Building the Unreal Shared Library
 
-Building the Unreal Live Link C Interface plugin DLL requires the Unreal Engine source code. Download the source code from [github](https://github.com/EpicGames/UnrealEngine).
+Building the Unreal Live Link C Interface plugin Shared Library requires the Unreal Engine source code. Download the source code from [github](https://github.com/EpicGames/UnrealEngine).
 
 #### Windows 10/11
 
