@@ -237,7 +237,7 @@ static void SetBasicFrameParameters(const char *SubjectName, const double WorldT
 	{
 		for (int Idx = 0; Idx < Metadata->keyValueCount; Idx++)
 		{
-			BaseData.MetaData.StringMetaData[Metadata->keyValues[Idx].name] = Metadata->keyValues[Idx].value;
+			BaseData.MetaData.StringMetaData.Add(Metadata->keyValues[Idx].name, Metadata->keyValues[Idx].value);
 		}
 
 		// set sceneTime
