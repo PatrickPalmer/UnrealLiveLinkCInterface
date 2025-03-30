@@ -4,7 +4,8 @@ project(UnrealLiveLinkCInterfaceAPI)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-add_library(${PROJECT_NAME} STATIC src/UnrealLiveLinkCInterfaceAPI.c)
+set(SOURCES UnrealLiveLinkCInterfaceAPI.c ../include/UnrealLiveLinkCInterfaceAPI.h ../include/UnrealLiveLinkCInterfaceTypes.h)
+add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     VERSION ${CMAKE_PROJECT_VERSION}
