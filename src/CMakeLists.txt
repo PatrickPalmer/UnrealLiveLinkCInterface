@@ -9,7 +9,7 @@ add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     VERSION ${CMAKE_PROJECT_VERSION}
-    PUBLIC_HEADER "include/UnrealLiveLinkCInterfaceAPI.h;include/UnrealLiveLinkCInterfaceTypes.h"
+    PUBLIC_HEADER "../include/UnrealLiveLinkCInterfaceAPI.h;../include/UnrealLiveLinkCInterfaceTypes.h"
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/include)
