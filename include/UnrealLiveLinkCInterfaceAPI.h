@@ -255,6 +255,16 @@ extern void (*UnrealLiveLink_SetLightStructure)(
 extern void (*UnrealLiveLink_UpdateLightFrame)(const char *subjectName, const double worldTime,
 	const struct UnrealLiveLink_Metadata *metadata, const struct UnrealLiveLink_PropertyValues *propValues, const struct UnrealLiveLink_Light *frame);
 
+
+/** Utilities **/
+
+/**
+ * Copy name from src to dst
+ * @param src source name
+ * @param dst destination UnrealLiveLink_Name
+ */
+extern void UnrealLiveLink_CopyName(const char *src, UnrealLiveLink_Name dst);
+
 #ifdef __cplusplus
 }
 #endif

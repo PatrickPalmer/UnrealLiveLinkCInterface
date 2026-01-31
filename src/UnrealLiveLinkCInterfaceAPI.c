@@ -328,3 +328,10 @@ void UnrealLiveLink_InitLight(struct UnrealLiveLink_Light *structure)
 		structure->lightColor[i] = 255;
 	}
 }
+
+void UnrealLiveLink_CopyName(const char *src, UnrealLiveLink_Name dst)
+{
+	strncpy(dst, src, UNREAL_LIVE_LINK_MAX_NAME_LENGTH); 
+	dst[UNREAL_LIVE_LINK_MAX_NAME_LENGTH - 1] = '\0';
+}
+
