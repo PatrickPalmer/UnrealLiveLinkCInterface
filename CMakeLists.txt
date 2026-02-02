@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.30)
 
-project(UnrealLiveLinkCInterface VERSION 2.1.0 DESCRIPTION "Unreal Live Link C Interface")
+project(UnrealLiveLinkCInterface VERSION 2.2.0 DESCRIPTION "Unreal Live Link C Interface")
 
 OPTION(BUILD_EXAMPLES "Build examples" OFF)
 OPTION(BUILD_PYTHON_MODULE "Build Python Module" ON)
