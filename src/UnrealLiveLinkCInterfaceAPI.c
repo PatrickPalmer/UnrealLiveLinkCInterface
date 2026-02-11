@@ -29,6 +29,7 @@
 
 #include <stdio.h>
 #include <stddef.h>
+#include <string.h>
 
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN

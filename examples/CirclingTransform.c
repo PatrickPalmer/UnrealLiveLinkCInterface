@@ -64,8 +64,8 @@ int main()
 	ts.tv_nsec = 16 * 1000000;
 #endif
 
-	rc = UnrealLiveLink_Load(sharedObj, "CirclingTransform");
-	if (rc != UNREAL_LIVE_LINK_OK) 
+	rc = UnrealLiveLink_Load(sharedObj);
+	if (rc != UNREAL_LIVE_LINK_OK)
 	{
 		printf("error: unable to load %s (error %d)\n", sharedObj, rc);
 		return 1;
